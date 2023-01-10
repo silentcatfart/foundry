@@ -30,11 +30,52 @@ variable "location" {
   type                            = string
 }
 
-#variable "vpn-snet" {
-#  description                     = "Subnet ID for vpn-snet"
-#  type                            = string
-#}
+variable "vnet-cidr" {
+  description                     = "VNET Address range"
+  type                            = string
+}
 
+variable "snet-0-cidr" {
+  description                     = "Subnet 0 address range"
+  type                            = string
+}
+
+/*
+variable "snet-1-cidr" {
+  description                     = "Subnet 1 address range"
+  type                            = string
+}
+
+variable "snet-2-cidr" {
+  description                     = "Subnet 2 address range"
+  type                            = string
+}
+
+variable "snet-3-cidr" {
+  description                     = "Subnet 3 address range"
+  type                            = string
+}
+
+variable "snet-4-cidr" {
+  description                     = "Subnet 4 address range"
+  type                            = string
+}
+
+variable "snet-5-cidr" {
+  description                     = "Subnet 5 address range"
+  type                            = string
+}
+
+variable "snet-6-cidr" {
+  description                     = "Subnet 6 address range"
+  type                            = string
+}
+
+variable "snet-7-cidr" {
+  description                     = "Subnet 7 address range"
+  type                            = string
+}
+*/
 variable "vm-size" {
   description                     = "Size / SKU of the VM"
   type                            = string

@@ -25,27 +25,3 @@ resource "azurerm_subnet" "web-snet" {
   virtual_network_name                              = azurerm_virtual_network.vnet.name
   address_prefixes                                  = [var.snet-web-address]
 }
-
-resource "azurerm_subnet" "bastion-snet" {
-  depends_on                                        = [
-                                                    azurerm_virtual_network.vnet,
-                                                    azurerm_resource_group.rg
-                                                    ]
-
-  name                                              = "AzureBastionSubnet"
-  resource_group_name                               = azurerm_resource_group.rg.name
-  virtual_network_name                              = azurerm_virtual_network.vnet.name
-  address_prefixes                                  = [var.snet-bastion-address]
-}
-
-resource "azurerm_subnet" "ad-snet" {
-  depends_on                                        = [
-                                                    azurerm_virtual_network.vnet,
-                                                    azurerm_resource_group.rg
-                                                    ]
-
-  name                                              = "ActiveDirectory"
-  resource_group_name                               = azurerm_resource_group.rg.name
-  virtual_network_name                              = azurerm_virtual_network.vnet.name
-  address_prefixes                                  = [var.snet-ad-address]
-}

@@ -105,6 +105,7 @@ resource "azurerm_lb_rule" "lb-rule-ssh-lbe" {
   backend_port                      = 22
   frontend_ip_configuration_name    = "loadbalancer-frontend"
   backend_address_pool_ids          = [azurerm_lb_backend_address_pool.lb-backendpool-lbe.id]
+  probe_id                          = azurerm_lb_probe.lb-probe-lbe-tcp22.id
   load_distribution                 = "SourceIP"
   idle_timeout_in_minutes           = 4
   disable_outbound_snat             = true

@@ -30,7 +30,7 @@ resource "azurerm_network_security_rule" "web-snet-nsg-az-lb-in" {
   network_security_group_name                    = azurerm_network_security_group.web-snet-nsg.name
 }
 
-/*
+
 resource "azurerm_network_security_rule" "web-snet-nsg-ssh-in" {
   depends_on                                     = [azurerm_network_security_group.web-snet-nsg]
 
@@ -42,7 +42,7 @@ resource "azurerm_network_security_rule" "web-snet-nsg-ssh-in" {
   protocol                                       = "Tcp"
   source_port_range                              = "*"
   destination_port_ranges                        = ["22"]
-  source_address_prefix                          = "AzureLoadBalancer"
+  source_address_prefix                          = "Internet"
   destination_address_prefix                     = "${var.snet-0-cidr}"
   resource_group_name                            = azurerm_resource_group.rg.name
   network_security_group_name                    = azurerm_network_security_group.web-snet-nsg.name
@@ -59,12 +59,11 @@ resource "azurerm_network_security_rule" "web-snet-nsg-foundry-in" {
   protocol                                       = "Tcp"
   source_port_range                              = "*"
   destination_port_ranges                        = ["30000"]
-  source_address_prefix                          = "AzureLoadBalancer"
+  source_address_prefix                          = "Internet"
   destination_address_prefix                     = "${var.snet-0-cidr}"
   resource_group_name                            = azurerm_resource_group.rg.name
   network_security_group_name                    = azurerm_network_security_group.web-snet-nsg.name
 }
-*/
 
 resource "azurerm_network_security_rule" "web-snet-nsg-intra-subnet-in" {
   depends_on                                     = [azurerm_network_security_group.web-snet-nsg]

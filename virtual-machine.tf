@@ -55,6 +55,34 @@ resource "azurerm_linux_virtual_machine" "vm-01" {
   tags                              = "${(local.tags)}"
 }
 
+resource "azurerm_managed_disk" "vm-01-disk" {
+  depends_on                        = [
+                                      azurerm_resource_group.rg
+                                      ]
+
+  name                              = "${var.azure-resource-name}-vm-01-disk"
+  location                          = var.location
+  resource_group_name               = azurerm_resource_group.rg.name
+  storage_account_type              = "Standard_LRS"
+  create_option                     = "Empty"
+  disk_size_gb                      = var.data-disk-size
+  zone                              = 1
+
+  tags                              = "${(local.tags)}"
+}
+
+resource "azurerm_virtual_machine_data_disk_attachment" "vm-01-diskattach" {
+  depends_on                        = [
+                                      azurerm_managed_disk.vm-01-disk,
+                                      azurerm_linux_virtual_machine.vm-01
+                                      ]
+
+  managed_disk_id                   = azurerm_managed_disk.vm-01-disk.id
+  virtual_machine_id                = azurerm_linux_virtual_machine.vm-01.id
+  lun                               = "10"
+  caching                           = "ReadWrite"
+}
+
 resource "azurerm_backup_protected_vm" "vm-01-rsvvm" {
   depends_on                        = [
                                       azurerm_backup_policy_vm.rsv-policy,

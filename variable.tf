@@ -45,7 +45,6 @@ variable "cloudflare-cidr" {
   type                            = list
 }
 
-/*
 variable "snet-1-cidr" {
   description                     = "Subnet 1 address range"
   type                            = string
@@ -80,7 +79,7 @@ variable "snet-7-cidr" {
   description                     = "Subnet 7 address range"
   type                            = string
 }
-*/
+
 variable "vm-size" {
   description                     = "Size / SKU of the VM"
   type                            = string
@@ -99,27 +98,4 @@ variable "data-disk-size" {
 variable "time-zone" {
   description                     = "Time Zone"
   type                            = string
-}
-
-variable "ansible-pwd" {
-  default                         = ""
-  description                     = "Ansible password"
-  type                            = string
-}
-
-
-#####################################################################
-######################## Hard Coded Variables #######################
-#####################################################################
-
-variable "azure-ad-tenant-id" {
-  description                     = "The tenant ID for Azure Active Directory."
-  type                            = string
-  default                         = "a8059119-87be-4583-9a4e-7fc59ec6cbf9"
-}
-
-variable "tfcloud-obj-id" {
-  description                     = "The object ID of the terraform-cloud service principle."
-  type                            = string
-  default                         = "6d34567d-d65d-486f-b8c8-615bfc0b5449"
 }

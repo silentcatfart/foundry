@@ -1,6 +1,6 @@
 # NSGs
 resource "azurerm_network_security_group" "web-snet-nsg" {
-  depends_on                        		         = [azurerm_resource_group.rg]
+  depends_on                                     = [azurerm_resource_group.rg]
 
   name                                           = "${var.azure-resource-name}-web-snet-nsg"
   location                                       = var.location

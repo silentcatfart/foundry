@@ -40,6 +40,11 @@ variable "snet-0-cidr" {
   type                            = string
 }
 
+variable "cloudflare-cidr" {
+  description                     = "Cloudflare address range"
+  type                            = list
+}
+
 /*
 variable "snet-1-cidr" {
   description                     = "Subnet 1 address range"

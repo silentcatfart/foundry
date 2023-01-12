@@ -1,5 +1,7 @@
 resource "azurerm_network_interface" "vm-01-nic" {
-  depends_on                        = [azurerm_resource_group.rg]
+  depends_on                        = [azurerm_resource_group.rg,
+                                       azurerm_public_ip.pip
+                                      ]
 
   name                              = "${var.azure-resource-name}-vm-01-nic"
   location                          = var.location
@@ -10,6 +12,7 @@ resource "azurerm_network_interface" "vm-01-nic" {
     name                            = "base-ip"
     subnet_id                       = azurerm_subnet.web-snet.id
     private_ip_address_allocation   = "Dynamic"
+    public_ip_address_id            = azurerm_public_ip.pip.id
   }
 
   tags                              = "${(local.tags)}"
@@ -18,7 +21,8 @@ resource "azurerm_network_interface" "vm-01-nic" {
 resource "azurerm_linux_virtual_machine" "vm-01" {
   depends_on                        = [
                                       azurerm_resource_group.rg,
-                                      azurerm_network_interface.vm-01-nic
+                                      azurerm_network_interface.vm-01-nic,
+                                      azurerm_public_ip.pip
                                       ]
 
   name                              = "${var.azure-resource-name}-01-vm"

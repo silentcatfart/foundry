@@ -31,7 +31,7 @@ resource "azurerm_network_security_rule" "web-snet-nsg-ssh-in" {
   network_security_group_name                    = azurerm_network_security_group.web-snet-nsg.name
 }
 
-
+/*
 resource "azurerm_network_security_rule" "web-snet-nsg-foundry-in" {
   depends_on                                     = [azurerm_network_security_group.web-snet-nsg]
 
@@ -48,7 +48,7 @@ resource "azurerm_network_security_rule" "web-snet-nsg-foundry-in" {
   resource_group_name                            = azurerm_resource_group.rg.name
   network_security_group_name                    = azurerm_network_security_group.web-snet-nsg.name
 }
-
+*/
 
 resource "azurerm_network_security_rule" "web-snet-nsg-foundry-https-in" {
   depends_on                                     = [azurerm_network_security_group.web-snet-nsg]
@@ -61,8 +61,8 @@ resource "azurerm_network_security_rule" "web-snet-nsg-foundry-https-in" {
   protocol                                       = "Tcp"
   source_port_range                              = "*"
   destination_port_ranges                        = ["80","443"]
-  source_address_prefix                          = "Internet"
-#  source_address_prefixes                        = var.cloudflare-cidr
+#  source_address_prefix                          = "Internet"
+  source_address_prefixes                        = var.cloudflare-cidr
   destination_address_prefix                     = "${var.snet-0-cidr}"
   resource_group_name                            = azurerm_resource_group.rg.name
   network_security_group_name                    = azurerm_network_security_group.web-snet-nsg.name

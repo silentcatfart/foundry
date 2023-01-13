@@ -13,14 +13,7 @@ Here's some Terraform code to provision artifacts used to self-host a Foundry Vi
 FYI: I'm using a free Terraform Cloud account. Don't forget to create a service principal in Azure
 with contributer rights. Then set your Terraform Cloud workspace env variables.
 
-* ARM_CLIENT_ID
-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-* ARM_CLIENT_SECRET
-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-* ARM_SUBSCRIPTION_ID
-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-* ARM_TENANT_ID
-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+![](./images/tfwkspace.png)
 
 You'll notice commented out sections in the tfvars and nsg.tf. These can be modified to scale up
 when you are ready to host a game vs. just having it sitting around for world building. You may
@@ -35,7 +28,7 @@ I have 2 Cloudflare DNS records. One is "grey clouded/unproxied" to allow SSH. T
 
 I have three WAF rules in Cloudflare:
 
-![](./cfwaf.png)
+![](./images/cfwaf.png)
 
 I toggle rule 2 on and 3 off when i'm ready to host a game. It blocks all countries except where my
 players are located. Otherwise, I run with rules 1 and 3 toggled on to work on my worlds and reduce the
@@ -47,4 +40,4 @@ Foundry code and user data to the Azure storage account nightly.
 
 About [Foundry](https://foundryvtt.com/)
 
-![](./image.svg)
+![](./images/bounce.svg)

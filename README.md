@@ -1,6 +1,6 @@
 # Foundry VTT - Azure Terraform
 
-Here's some Terraform code to provision:
+Here's some Terraform code to provision artifacts used to self-host a Foundry Virtual Table Top server:
 
 * Virtual Network
 * Subnet(s) with Network Security Group

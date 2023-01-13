@@ -23,7 +23,7 @@ I have 2 Cloudflare DNS records. One is "grey clouded/unproxied" to allow SSH. T
 
 I have three WAF rules in Cloudflare:
 
-![](./cfwaf/png.png)
+![](./cfwaf.png)
 
 I toggle rule 2 on and 3 off when i'm ready to host a game. It blocks all countries except where my
 players are located. Otherwise, I run with rules 1 and 3 toggled on to work on my worlds and reduce the

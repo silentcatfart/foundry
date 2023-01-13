@@ -10,8 +10,8 @@ Here's some Terraform code to provision artifacts used to self-host a Foundry Vi
 * Recovery Vault
 * Storage account
 
-FYI: I'm using a free Terraform Cloud account. Don;t forget to create a service principal in Azure
-with contributer rights in Azure. Then set your Terraform Cloud workspace env variables.
+FYI: I'm using a free Terraform Cloud account. Don't forget to create a service principal in Azure
+with contributer rights. Then set your Terraform Cloud workspace env variables.
 
 * ARM_CLIENT_ID
 xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx

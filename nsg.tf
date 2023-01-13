@@ -25,7 +25,7 @@ resource "azurerm_network_security_rule" "web-snet-nsg-ssh-in" {
   source_port_range                              = "*"
   destination_port_ranges                        = ["22"]
 #  source_address_prefix                          = "Internet"
-  source_address_prefix                          = "71.230.53.86"
+  source_address_prefix                          = var.my-public-ip
   destination_address_prefix                     = "${var.snet-0-cidr}"
   resource_group_name                            = azurerm_resource_group.rg.name
   network_security_group_name                    = azurerm_network_security_group.web-snet-nsg.name

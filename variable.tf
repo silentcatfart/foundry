@@ -45,6 +45,11 @@ variable "cloudflare-cidr" {
   type                            = list
 }
 
+variable "my-public-ip" {
+  description                     = "My public IP address"
+  type                            = string
+}
+
 variable "snet-1-cidr" {
   description                     = "Subnet 1 address range"
   type                            = string

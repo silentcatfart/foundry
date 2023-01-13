@@ -8,6 +8,7 @@ vm-size                         = "Standard_B1s"
 vm-admin                        = "foundry"
 data-disk-size                  = "32"
 time-zone                       = "Eastern Standard Time"
+my-public-ip                    = "71.230.53.86"
 vnet-cidr                       = "10.250.0.0/21"
 snet-0-cidr                     = "10.250.0.0/24"
 cloudflare-cidr                 = ["173.245.48.0/20",

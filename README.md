@@ -15,13 +15,10 @@ with contributer rights. Then set your Terraform Cloud workspace env variables.
 
 * ARM_CLIENT_ID
 xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-
 * ARM_CLIENT_SECRET
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
 * ARM_SUBSCRIPTION_ID
 xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-
 * ARM_TENANT_ID
 xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 

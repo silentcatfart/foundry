@@ -30,6 +30,11 @@ variable "location" {
   type                            = string
 }
 
+variable "my-public-ip" {
+  description                     = "My public IP address"
+  type                            = string
+}
+
 variable "vnet-cidr" {
   description                     = "VNET Address range"
   type                            = string
@@ -43,11 +48,6 @@ variable "snet-0-cidr" {
 variable "cloudflare-cidr" {
   description                     = "Cloudflare address range"
   type                            = list
-}
-
-variable "my-public-ip" {
-  description                     = "My public IP address"
-  type                            = string
 }
 
 variable "snet-1-cidr" {

@@ -30,4 +30,7 @@ players are located. Otherwise, I run with rules 1 and 3 toggled on to work on m
 attack surface of Foundry. Of course if you need players to be able to hop in and out of the server at
 any time, you would adjust these accordingly.
 
+I have rclone configured on the server. There's a cron job that stops the Foundry service and synchs the
+Foundry code and user data to the Azure storage account nightly.
+
 ![](./image.svg)

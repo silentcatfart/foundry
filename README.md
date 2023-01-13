@@ -10,6 +10,21 @@ Here's some Terraform code to provision artifacts used to self-host a Foundry Vi
 * Recovery Vault
 * Storage account
 
+FYI: I'm using a free Terraform Cloud account. Don;t forget to create a service principal in Azure
+with contributer rights in Azure. Then set your Terraform Cloud workspace env variables.
+
+* ARM_CLIENT_ID
+xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+* ARM_CLIENT_SECRET
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+* ARM_SUBSCRIPTION_ID
+xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
+* ARM_TENANT_ID
+xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+
 You'll notice commented out sections in the tfvars and nsg.tf. These can be modified to scale up
 when you are ready to host a game vs. just having it sitting around for world building. You may
 need to adjust NSGs when you first stand up and provision the server. The idea would be to uncomment

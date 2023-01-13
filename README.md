@@ -23,7 +23,7 @@ I have 2 Cloudflare DNS records. One is "grey clouded/unproxied" to allow SSH. T
 
 I have three WAF rules in Cloudflare:
 
-![2023-01-13 13_01_28-WAF (Web Application Firewall) _ Security - Firewall rules _ silentcatfart com _](https://user-images.githubusercontent.com/122320481/212393865-d2bab167-84a3-4263-9fbb-3aa4384ac085.png)
+![](./cfwaf/png.png)
 
 I toggle rule 2 on and 3 off when i'm ready to host a game. It blocks all countries except where my
 players are located. Otherwise, I run with rules 1 and 3 toggled on to work on my worlds and reduce the

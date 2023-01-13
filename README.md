@@ -45,6 +45,6 @@ any time, you would adjust these accordingly.
 I have rclone configured on the server. There's a cron job that stops the Foundry service and synchs the
 Foundry code and user data to the Azure storage account nightly.
 
-[Foundry](https://foundryvtt.com/)
+About [Foundry](https://foundryvtt.com/)
 
 ![](./image.svg)

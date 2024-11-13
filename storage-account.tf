@@ -9,10 +9,5 @@ resource "azurerm_storage_account" "storage" {
   account_replication_type                       = "GRS"
   access_tier                                    = "Hot"
 
-identity {
-  type                                           = "UserAssigned"
-  identity_ids                                   = [azurerm_user_assigned_identity.managed-id.id]
-}
-
   tags                                           = "${(local.tags)}"
 }

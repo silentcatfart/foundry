@@ -1,0 +1,79 @@
+---
+- hosts: [new]
+  become: true
+  gather_facts: false
+
+  vars_files:
+    - var-secrets.yml
+
+  tasks:
+      - name: Download ngrok
+        ansible.builtin.shell:
+          chdir: /home/foundry
+          cmd: |
+            wget -O ngrok-v3-stable-linux-amd64.tgz {{ ngrok_url }}
+
+      - name: Unzip ngrok
+        ansible.builtin.shell:
+          chdir: /home/foundry
+          cmd: |
+            sudo tar -xvzf ngrok-v3-stable-linux-amd64.tgz -C /usr/local/bin
+
+      - name: Remove ngrok download
+        ansible.builtin.shell:
+          chdir: /home/foundry
+          cmd: |
+            rm ngrok-v3-stable-linux-amd64.tgz
+
+      - name: Create ngrok config directory
+        ansible.builtin.file:
+          path: /home/foundry/.config/ngrok
+          state: directory
+          mode: '775'
+
+      - name: Copy ngrok config to server
+        copy:
+          content: |
+            version: "2"
+            authtoken: {{ ngrok_authtoken }}
+            tunnels:
+              minecraft:
+                addr: 25565
+                proto: tcp
+                remote_addr: {{ ngrok_remote_add }}
+          dest: /home/foundry/.config/ngrok/ngrok.yml
+          force: no
+
+      - name: Copy ngrok service config to server
+        copy:
+          content: |
+            ## /etc/systemd/system/minecraft-ngrok.service
+            [Unit]
+            Description=ngrok tunnel
+            After=network-online.target
+            Wants=network-online.target systemd-networkd-wait-online.service
+
+            [Service]
+            ExecStart=/usr/local/bin/ngrok start --all --config /home/foundry/.config/ngrok/ngrok.yml
+            ExecReload=/bin/kill -HUP $MAINPID
+            KillMode=process
+            IgnoreSIGPIPE=true
+            Restart=always
+            RestartSec=3
+            Type=simple
+
+            [Install]
+            WantedBy=multi-user.target
+          dest: /etc/systemd/system/minecraft-ngrok.service
+          force: no
+
+      - name: Enable services
+        ansible.builtin.shell:
+          cmd: |
+            sudo systemctl daemon-reload
+            sudo systemctl enable minecraft-ngrok.service
+
+      - name: Start services
+        ansible.builtin.shell:
+          cmd: |
+            sudo systemctl start minecraft-ngrok.service

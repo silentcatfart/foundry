@@ -1,0 +1,3 @@
+devices:
+- device: /dev/sdc1
+  mount: /datadrive

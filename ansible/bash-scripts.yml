@@ -1,0 +1,30 @@
+---
+- hosts: [new]
+  become: true
+  gather_facts: false
+
+  vars_files:
+    - var-secrets.yml
+
+  tasks:
+      - name: Create rclone-local-to-az script
+        copy:
+          content: |
+             #!/bin/bash
+             pm2 stop foundry
+             /usr/bin/rclone sync /home/foundry/foundrydrive "azure blob":foundry-new
+             pm2 start foundry
+          dest: /home/foundry/rclone-local-to-az
+          force: no
+          mode: '777'
+
+      - name: Create rclone-az-to-local script
+        copy:
+          content: |
+             #!/bin/bash
+             pm2 stop foundry
+             /usr/bin/rclone sync "azure blob":foundry-new /home/foundry/foundrydrive
+             pm2 start foundry
+          dest: /home/foundry/rclone-az-to-local
+          force: no
+          mode: '777'

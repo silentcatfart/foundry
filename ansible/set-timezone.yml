@@ -1,0 +1,13 @@
+---
+- hosts: [new]
+  become: true
+  gather_facts: false
+
+  vars_files:
+    - var-secrets.yml
+
+  tasks:
+    - name: Set timezone to America/New_York
+      become: true
+      community.general.timezone:
+        name: America/New_York

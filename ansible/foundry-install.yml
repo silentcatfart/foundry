@@ -1,0 +1,35 @@
+---
+- hosts: [new]
+  become: false
+  gather_facts: false
+
+  vars_files:
+    - var-secrets.yml
+
+  tasks:
+      - name: Make foundry directories
+        ansible.builtin.shell:
+          chdir: foundrydrive
+          cmd: |
+            mkdir foundry
+            mkdir foundryuserdata
+
+      - name: Download foundry
+        ansible.builtin.shell:
+          chdir: /home/foundry
+          cmd: |
+            wget --output-document /home/foundry/foundrydrive/foundry/foundryvtt.zip {{ foundry_url }}
+
+      - name: Unzip foundry
+        ansible.builtin.shell:
+          chdir: /home/foundry
+          cmd: |
+            unzip /home/foundry/foundrydrive/foundry/foundryvtt.zip  -d /home/foundry/foundrydrive/foundry/
+            rm /home/foundry/foundrydrive/foundry/foundryvtt.zip
+
+      - name: Start foundry
+        ansible.builtin.shell:
+          chdir: /home/foundry
+          cmd: |
+            pm2 start "node /home/foundry/foundrydrive/foundry/resources/app/main.js --dataPath=/home/foundry/foundrydrive/foundryuserdata" --name foundry
+            pm2 save

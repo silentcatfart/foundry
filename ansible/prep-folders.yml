@@ -1,0 +1,23 @@
+---
+- hosts: [new]
+  become: true
+  gather_facts: false
+
+  vars_files:
+    - var-secrets.yml
+
+  tasks:
+      - name: Make foundry directory
+        ansible.builtin.shell:
+          chdir: /datadrive
+          cmd: |
+            sudo mkdir foundryvtt
+            sudo chmod -R 777 foundryvtt
+
+      - name: Create symbolic link in home directory
+        ansible.builtin.shell:
+          chdir: /home/foundry
+          cmd: |
+            ln -s  /datadrive/foundryvtt foundrydrive
+
+

@@ -1,0 +1,29 @@
+---
+- hosts: [new]
+  become: true
+  gather_facts: false
+
+  vars_files:
+    - var-secrets.yml
+
+  tasks:
+      - name: Install rclone
+        ansible.builtin.apt:
+          pkg:
+          - rclone
+
+      - name: Create config directory
+        ansible.builtin.file:
+          path: /home/foundry/.config/rclone
+          state: directory
+          mode: '775'
+
+      - name: Copy rclone config to server
+        copy:
+          content: |
+            [azure blob]
+            type = azureblob
+            account = fndryst
+            key = {{ blob_sas_key }}
+          dest: /home/foundry/.config/rclone/rclone.conf
+          force: no

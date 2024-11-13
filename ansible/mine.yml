@@ -1,0 +1,109 @@
+---
+- hosts: [new]
+  become: true
+  gather_facts: false
+
+  vars_files:
+    - var-secrets.yml
+
+  tasks:
+      - name: Update package cache
+        ansible.builtin.apt:
+          update_cache=yes
+
+      - name: Install java and screen
+        ansible.builtin.apt:
+          pkg:
+          - openjdk-21-jre-headless
+          - screen
+
+      - name: Make minecraft directory
+        ansible.builtin.shell:
+          chdir: foundrydrive
+          cmd: |
+            mkdir minecraft
+
+      - name: Update folder ownership to foundry
+        ansible.builtin.shell:
+          chdir: /home/foundry
+          cmd: |
+            sudo chown -R foundry:foundry /home/foundry/foundrydrive/minecraft
+
+      - name: Download Minecraft
+        ansible.builtin.shell:
+          chdir: /home/foundry
+          cmd: |
+            wget -O /home/foundry/foundrydrive/minecraft/minecraft_server.jar {{ minecraft_url }}
+
+      - name: Bootstrap minecraft (max 60 seconds)
+        shell:
+          chdir: /home/foundry/foundrydrive/minecraft/
+          cmd: timeout 60 java -Xmx1024M -Xms1024M -jar minecraft_server.jar nogui
+        ignore_errors: yes
+
+      - name: Agree to eula
+        lineinfile:
+          path: /home/foundry/foundrydrive/minecraft/eula.txt
+          line: 'eula=true'
+
+      - name: Copy minecraft service config to server
+        copy:
+          content: |
+            ## /etc/systemd/system/minecraft.service
+
+            [Unit]
+            Description=Minecraft Server
+            After=network.target
+
+            [Service]
+            RemainAfterExit=yes
+            WorkingDirectory=/home/foundry/foundrydrive/minecraft
+            User=foundry
+            Group=foundry
+
+            # Start Screen, Java, and Minecraft
+            ExecStart=screen -s mc -d -m java -server -Xms1024M -Xmx1024M -jar minecraft_server.jar nogui
+
+            # Tell Minecraft to gracefully stop.
+            # Ending Minecraft will terminate Java
+            # systemd will kill Screen after the 10-second delay. No explicit kill for Screen needed
+            ExecStop=screen -p 0 -S mc -X eval 'stuff "say SERVER SHUTTING DOWN. Saving map..."\\015'
+            ExecStop=screen -p 0 -S mc -X eval 'stuff "save-all"\\015'
+            ExecStop=screen -p 0 -S mc -X eval 'stuff "stop"\\015'
+            ExecStop=sleep 10
+
+            [Install]
+            WantedBy=multi-user.target
+          dest: /etc/systemd/system/minecraft.service
+          force: no
+
+      - name: Enable services
+        ansible.builtin.shell:
+          cmd: |
+            sudo systemctl daemon-reload
+            sudo systemctl enable minecraft.service
+
+      - name: Start services
+        ansible.builtin.shell:
+          cmd: |
+            sudo systemctl start minecraft.service
+
+      - name: Create kill-minecraft script
+        copy:
+          content: |
+             #!/bin/bash
+             sudo systemctl stop minecraft-ngrok.service
+             sudo systemctl stop minecraft.service
+          dest: /home/foundry/kill-minecraft
+          force: no
+          mode: '777'
+
+      - name: Create start-minecraft script
+        copy:
+          content: |
+             #!/bin/bash
+             sudo systemctl start minecraft-ngrok.service
+             sudo systemctl start minecraft.service
+          dest: /home/foundry/start-minecraft
+          force: no
+          mode: '777'

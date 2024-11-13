@@ -1,0 +1,17 @@
+---
+- hosts: [new]
+  become: true
+  gather_facts: false
+
+  vars_files:
+    - var-secrets.yml
+
+  tasks:
+    - name: Nightly backup to Azure Storage"
+      ansible.builtin.cron:
+        name: "az-backup"
+        minute: "30"
+        hour: "1"
+        job: "/home/foundry/rclone-local-to-az"
+        user: foundry
+        disabled: true

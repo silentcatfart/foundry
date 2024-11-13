@@ -1,0 +1,26 @@
+---
+  - hosts: [all]
+    become: true
+    gather_facts: false
+
+    vars_files:
+      - var-secrets.yml
+
+    tasks:
+      - name: Update package cache
+        ansible.builtin.apt:
+          update_cache=yes
+
+      - name: Upgrade all apt packages
+        ansible.builtin.apt:
+          name=*
+          state=latest
+
+      - name: Check if reboot is required
+        stat:
+          path: /var/run/reboot-required
+        register: reboot_required
+
+      - name: Reboot server
+        reboot:
+        when: reboot_required.stat.exists == true

@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source                                = "hashicorp/azurerm"
-      version                               = "= 3.4.0"
+      version                               = "= 3.90.0"
     }
 
     azuread = {
@@ -14,6 +14,11 @@ terraform {
       source                                = "hashicorp/random"
       version                               = "= 3.1.3"
     }
+
+    template = {
+      source                                = "hashicorp/template"
+      version                               = "2.2.0"
+    }
   }
 
   backend "remote" {
@@ -21,7 +26,7 @@ terraform {
 
     workspaces {
       name                                  = "foundry"
-   }
+    }
   }
 }
 

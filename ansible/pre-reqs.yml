@@ -1,0 +1,42 @@
+---
+- hosts: [new]
+  become: true
+  gather_facts: false
+
+  vars_files:
+    - var-secrets.yml
+
+  tasks:
+      - name: Install prerequisites for gpg keys
+        ansible.builtin.apt:
+          pkg:
+          - ca-certificates
+          - curl
+          - gnupg
+          - net-tools
+
+      - name: Prep node repo
+        ansible.builtin.shell:
+          cmd: |
+            sudo mkdir -p /etc/apt/keyrings
+            curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+            echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+
+      - name: Prep caddy repo
+        ansible.builtin.shell:
+          cmd: |
+            sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
+            curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+            curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+
+      - name: Update package cache
+        ansible.builtin.apt:
+          update_cache=yes
+
+      - name: Install technologies needed by foundry
+        ansible.builtin.apt:
+          pkg:
+          - libnss3-tools
+          - nodejs
+          - caddy
+          - unzip

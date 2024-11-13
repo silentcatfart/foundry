@@ -1,0 +1,45 @@
+---
+- hosts: [new]
+  become: true
+  gather_facts: false
+
+  vars_files:
+    - var-secrets.yml
+    - var-device.yml
+
+  tasks:
+      - name: Create a new xfs primary partition
+        community.general.parted:
+          device: /dev/sdc
+          number: 1
+          label: gpt
+          name: xfspart
+          state: present
+          fs_type: xfs
+          part_start: "0%"
+          part_end: "100%"
+
+      - name: Create a xfs filesystem on /dev/sdc1
+        community.general.filesystem:
+          fstype: xfs
+          dev: /dev/sdc1
+
+      - name: Inform the OS about the partition table change
+        ansible.builtin.shell: "sudo partprobe /dev/sdc1"
+
+      - name: Make the /datadrive directory
+        ansible.builtin.shell: "sudo mkdir /datadrive"
+
+      - name: Get UUID
+        ansible.builtin.command: lsblk {{ item.device }} -no UUID
+        loop: "{{ devices }}"
+        register: uuid
+
+      - name: Mount volume and create fstab entry
+        ansible.posix.mount:
+          path: "{{ item.item.mount }}"
+          src: UUID={{ item.stdout_lines[0] }}
+          state: mounted
+          fstype: xfs
+          opts: defaults,nofail
+        loop: "{{ uuid.results }}"

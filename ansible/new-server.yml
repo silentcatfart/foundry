@@ -1,0 +1,14 @@
+---
+  - import_playbook: set-timezone.yml
+  - import_playbook: packageupdates.yml
+  - import_playbook: sudoer.yml
+  - import_playbook: drive-init.yml
+  - import_playbook: prep-folders.yml
+  - import_playbook: pre-reqs.yml
+  - import_playbook: pm2.yml
+  - import_playbook: rclone.yml
+  - import_playbook: bash-scripts.yml
+  - import_playbook: cron-jobs.yml
+  - import_playbook: foundry-install.yml
+#  - import_playbook: ngrok.yml
+#  - import_playbook: mine.yml

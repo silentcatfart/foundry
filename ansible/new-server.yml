@@ -13,4 +13,4 @@
   - import_playbook: options.yml
   - import_playbook: caddy.yml ## gets you to a vanilla install running on https up to entering the license file
 #  - import_playbook: ngrok.yml ## used for minecraft server
-#  - import_playbook: mine.yml ## minecraft server setup
+#  - import_playbook: minecraft.yml ## minecraft server setup

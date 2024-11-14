@@ -2,16 +2,14 @@
 
 Provision artifacts used to self-host a Foundry Virtual Table Top environment:
 
-* Virtual Network
-* Subnet(s) with Network Security Group
-* Foundry Production Virtual Machine with public IP
-* Foundry Testing Virtual Machine with public IP
-* LiveKit Virtual Machine with public IP
-* 128 GB data drive
+* Virtual Network/subnet with Network Security Group
+* Foundry Production Virtual Machine
+* Foundry Testing Virtual Machine
+* LiveKit Virtual Machine
+* 128 GB data drives
 * Storage account
 
-I have rclone configured on the server. There's a cron job that stops the Foundry service and synchs the
-Foundry code and user data to an Azure storage account nightly.
+I have rclone configured on the server. There's a cron job that stops the Foundry service and syncs the Foundry code and user data to an Azure storage account nightly.
 
 About [Foundry](https://foundryvtt.com/)
 

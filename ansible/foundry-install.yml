@@ -1,5 +1,5 @@
 ---
-- hosts: [new]
+- hosts: [tst]
   become: false
   gather_facts: false
 

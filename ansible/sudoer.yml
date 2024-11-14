@@ -1,6 +1,6 @@
 ## foundry ALL=(ALL) NOPASSWD:ALL in /etc/sudoers.d/ folder
 ---
-- hosts: [new]
+- hosts: [tst]
   become: true
   gather_facts: false
 

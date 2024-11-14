@@ -1,0 +1,36 @@
+---
+- hosts: [tst]
+  become: false
+  gather_facts: false
+
+  vars_files:
+    - var-secrets.yml
+
+  tasks:
+      - name: Stop foundry
+        ansible.builtin.shell:
+          cmd: |
+            pm2 stop foundry
+
+      - name: Update options.json proxy port
+        replace:
+          path: /home/foundry/foundrydrive/foundryuserdata/Config/options.json
+          regexp: '"proxyPort": null,'
+          replace: '"proxyPort": 443,'
+
+      - name: Update options.json SSL enable
+        replace:
+          path: /home/foundry/foundrydrive/foundryuserdata/Config/options.json
+          regexp: '"proxySSL": false,'
+          replace: '"proxySSL": true,'
+
+      - name: Update options.json hostname
+        replace:
+          path: /home/foundry/foundrydrive/foundryuserdata/Config/options.json
+          regexp: '"hostname": null,'
+          replace: '"hostname": "new.foundry.silentcatfart.com",'
+
+      - name: Start foundry
+        ansible.builtin.shell:
+          cmd: |
+            pm2 start foundry

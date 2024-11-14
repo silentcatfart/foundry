@@ -1,0 +1,42 @@
+---
+- hosts: [tst]
+  become: true
+  gather_facts: true
+
+  vars_files:
+    - var-secrets.yml
+
+  tasks:
+      - name: Create caddy config
+        copy:
+          content: |
+             # This replaces the existing content in /etc/caddy/Caddyfile
+             # A CONFIG SECTION FOR YOUR IP AND HOSTNAME
+
+             {
+             default_sni {{ ansible_default_ipv4.address }}
+             }
+
+             {{ ansible_default_ipv4.address }} {
+             # PROXY ALL REQUEST TO PORT 30000
+             tls internal
+             reverse_proxy localhost:30000
+             encode zstd gzip
+             }
+
+             new.foundry.silentcatfart.com {
+             # PROXY ALL REQUEST TO PORT 30000
+             reverse_proxy localhost:30000
+             encode zstd gzip
+             }
+
+             # Refer to the Caddy docs for more information:
+             # https://caddyserver.com/docs/caddyfile
+          dest: /etc/caddy/Caddyfile
+          force: yes
+          mode: '644'
+
+      - name: Restart caddy
+        ansible.builtin.shell:
+          cmd: |
+            sudo service caddy restart

@@ -8,7 +8,9 @@
   - import_playbook: pm2.yml
   - import_playbook: rclone.yml
   - import_playbook: bash-scripts.yml
-  - import_playbook: cron-jobs.yml
+  - import_playbook: cron-jobs.yml ## NOTE: job disabled by default
   - import_playbook: foundry-install.yml
-#  - import_playbook: ngrok.yml
-#  - import_playbook: mine.yml
+  - import_playbook: options.yml
+  - import_playbook: caddy.yml ## gets you to a vanilla install running on https up to entering the license file
+#  - import_playbook: ngrok.yml ## used for minecraft server
+#  - import_playbook: mine.yml ## minecraft server setup

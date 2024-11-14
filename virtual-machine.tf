@@ -1,4 +1,5 @@
 ## LiveKit Server
+
 resource "azurerm_network_interface" "vm-01-nic" {
   depends_on                        = [azurerm_resource_group.rg,
                                        azurerm_public_ip.pip-01
@@ -7,7 +8,6 @@ resource "azurerm_network_interface" "vm-01-nic" {
   name                              = "${var.azure-resource-name}-livekit-01-vm-nic"
   location                          = var.location
   resource_group_name               = azurerm_resource_group.rg.name
-#  enable_accelerated_networking     = "true"
 
   ip_configuration {
     name                            = "base-ip"
@@ -56,6 +56,7 @@ resource "azurerm_linux_virtual_machine" "vm-01" {
 }
 
 ## Production Server
+
 resource "azurerm_network_interface" "vm-02-nic" {
   depends_on                        = [azurerm_resource_group.rg,
                                        azurerm_public_ip.pip-02
@@ -64,7 +65,6 @@ resource "azurerm_network_interface" "vm-02-nic" {
   name                              = "${var.azure-resource-name}-vtt-prd-01-nic"
   location                          = var.location
   resource_group_name               = azurerm_resource_group.rg.name
-#  enable_accelerated_networking     = "true"
 
   ip_configuration {
     name                            = "base-ip"
@@ -137,7 +137,8 @@ resource "azurerm_virtual_machine_data_disk_attachment" "vm-02-diskattach" {
   caching                           = "ReadWrite"
 }
 
-## Test Server
+## Test
+
 resource "azurerm_network_interface" "vm-03-nic" {
   depends_on                        = [azurerm_resource_group.rg,
                                        azurerm_public_ip.pip-03
@@ -146,7 +147,6 @@ resource "azurerm_network_interface" "vm-03-nic" {
   name                              = "${var.azure-resource-name}-vtt-tst-01-nic"
   location                          = var.location
   resource_group_name               = azurerm_resource_group.rg.name
-#  enable_accelerated_networking     = "true"
 
   ip_configuration {
     name                            = "base-ip"

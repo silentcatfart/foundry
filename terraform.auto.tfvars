@@ -1,16 +1,31 @@
 project-tag                     = "Foundry VTT"
 azure-resource-name             = "foundry"
 azure-resource-name-nospace     = "fndry"
-server-hostname                 = "foundryvtt"
+
+## LiveKit
+vm-01-size                      = "Standard_B2ms"
+vm-01-hostname                  = "livekit"
+vm-01-data-disk-size            = "32"
+
+## Production
+vm-02-size                      = "Standard_B2ms"
+vm-02-hostname                  = "foundryvtt-prd"
+vm-02-data-disk-size            = "128"
+
+## Test
+vm-03-size                      = "Standard_B2ms"
+vm-03-hostname                  = "foundryvtt-tst"
+vm-03-data-disk-size            = "128"
+
 location                        = "eastus2"
-vm-size                         = "Standard_B1s"
-#vm-size                         = "Standard_B2ms"
+
 vm-admin                        = "foundry"
-data-disk-size                  = "32"
 time-zone                       = "Eastern Standard Time"
+
 my-public-ip                    = "71.230.53.86"
-vnet-cidr                       = "10.250.0.0/21"
+vnet-cidr                       = "10.250.0.0/24"
 snet-0-cidr                     = "10.250.0.0/24"
+
 cloudflare-cidr                 = ["173.245.48.0/20",
                                    "103.21.244.0/22",
                                    "103.22.200.0/22",
@@ -26,11 +41,3 @@ cloudflare-cidr                 = ["173.245.48.0/20",
                                    "131.0.72.0/22",
                                    "104.16.0.0/13",
                                    "104.24.0.0/14"]
-snet-1-cidr                     = "10.250.1.0/24"
-snet-2-cidr                     = "10.250.2.0/24"
-snet-3-cidr                     = "10.250.3.0/24"
-snet-4-cidr                     = "10.250.4.0/24"
-snet-5-cidr                     = "10.250.5.0/24"
-snet-6-cidr                     = "10.250.6.0/24"
-snet-7-cidr                     = "10.250.6.0/24"
-

@@ -19,12 +19,6 @@ variable "azure-resource-name-nospace" {
   type                            = string
 }
 
-
-variable "server-hostname" {
-  description                     = "Server hostname"
-  type                            = string
-}
-
 variable "location" {
   description                     = "The Azure Region to deploy resources."
   type                            = string
@@ -50,53 +44,53 @@ variable "cloudflare-cidr" {
   type                            = list
 }
 
-variable "snet-1-cidr" {
-  description                     = "Subnet 1 address range"
-  type                            = string
-}
-
-variable "snet-2-cidr" {
-  description                     = "Subnet 2 address range"
-  type                            = string
-}
-
-variable "snet-3-cidr" {
-  description                     = "Subnet 3 address range"
-  type                            = string
-}
-
-variable "snet-4-cidr" {
-  description                     = "Subnet 4 address range"
-  type                            = string
-}
-
-variable "snet-5-cidr" {
-  description                     = "Subnet 5 address range"
-  type                            = string
-}
-
-variable "snet-6-cidr" {
-  description                     = "Subnet 6 address range"
-  type                            = string
-}
-
-variable "snet-7-cidr" {
-  description                     = "Subnet 7 address range"
-  type                            = string
-}
-
-variable "vm-size" {
+variable "vm-01-size" {
   description                     = "Size / SKU of the VM"
+  type                            = string
+}
+
+variable "vm-02-size" {
+  description                     = "Size / SKU of the VM"
+  type                            = string
+}
+
+variable "vm-03-size" {
+  description                     = "Size / SKU of the VM"
+  type                            = string
+}
+
+variable "vm-01-hostname" {
+  description                     = "OS hostname"
+  type                            = string
+}
+
+variable "vm-02-hostname" {
+  description                     = "OS hostname"
+  type                            = string
+}
+
+variable "vm-03-hostname" {
+  description                     = "OS hostname"
+  type                            = string
+}
+
+variable "vm-01-data-disk-size" {
+  description                     = "Data disk size in GB"
+  type                            = string
+}
+
+variable "vm-02-data-disk-size" {
+  description                     = "Data disk size in GB"
+  type                            = string
+}
+
+variable "vm-03-data-disk-size" {
+  description                     = "Data disk size in GB"
   type                            = string
 }
 
 variable "vm-admin" {
   description                     = "Local Administrator account of the VM"
-  type                            = string
-}
-
-variable "data-disk-size" {
-  description                     = "Data disk size in GB"
   type                            = string
 }
 

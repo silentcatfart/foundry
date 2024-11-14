@@ -1,6 +1,6 @@
 # NSGs
 resource "azurerm_network_security_group" "web-snet-nsg" {
-  depends_on                                     = [azurerm_resource_group.rg]
+  depends_on                        		         = [azurerm_resource_group.rg]
 
   name                                           = "${var.azure-resource-name}-web-snet-nsg"
   location                                       = var.location
@@ -17,7 +17,7 @@ resource "azurerm_network_security_rule" "web-snet-nsg-ssh-in" {
   depends_on                                     = [azurerm_network_security_group.web-snet-nsg]
 
   name                                           = "Allow-SSH-Inbound"
-  description                                    = "Needed for administering the serer"
+  description                                    = "Needed for administering the server"
   priority                                       = 160
   direction                                      = "Inbound"
   access                                         = "Allow"
@@ -25,44 +25,41 @@ resource "azurerm_network_security_rule" "web-snet-nsg-ssh-in" {
   source_port_range                              = "*"
   destination_port_ranges                        = ["22"]
 #  source_address_prefix                          = "Internet"
-  source_address_prefix                          = var.my-public-ip
+  source_address_prefix                          = "71.230.53.86"
   destination_address_prefix                     = "${var.snet-0-cidr}"
   resource_group_name                            = azurerm_resource_group.rg.name
   network_security_group_name                    = azurerm_network_security_group.web-snet-nsg.name
 }
 
-/*
 resource "azurerm_network_security_rule" "web-snet-nsg-foundry-in" {
   depends_on                                     = [azurerm_network_security_group.web-snet-nsg]
 
   name                                           = "Allow-Foundry-Inbound"
-  description                                    = "Web ports needed to access Foundry"
+  description                                    = "Ports needed to access Foundry"
   priority                                       = 170
   direction                                      = "Inbound"
   access                                         = "Allow"
   protocol                                       = "Tcp"
   source_port_range                              = "*"
-  destination_port_ranges                        = ["30000"]
+  destination_port_ranges                        = ["30000","80","443"]
   source_address_prefix                          = "Internet"
   destination_address_prefix                     = "${var.snet-0-cidr}"
   resource_group_name                            = azurerm_resource_group.rg.name
   network_security_group_name                    = azurerm_network_security_group.web-snet-nsg.name
 }
-*/
 
-resource "azurerm_network_security_rule" "web-snet-nsg-foundry-https-in" {
+resource "azurerm_network_security_rule" "web-snet-nsg-livekit-in" {
   depends_on                                     = [azurerm_network_security_group.web-snet-nsg]
 
-  name                                           = "Allow-Foundry-HTTPS-Inbound"
-  description                                    = "Standard web access"
-  priority                                       = 190
+  name                                           = "Allow-Livekit-Inbound"
+  description                                    = "Ports needed to access LiveKit"
+  priority                                       = 180
   direction                                      = "Inbound"
   access                                         = "Allow"
-  protocol                                       = "Tcp"
+  protocol                                       = "*"
   source_port_range                              = "*"
-  destination_port_ranges                        = ["80","443"]
-#  source_address_prefix                          = "Internet"
-  source_address_prefixes                        = var.cloudflare-cidr
+  destination_port_ranges                        = ["50000-60000","443","80","7881","3478"]
+  source_address_prefix                          = "Internet"
   destination_address_prefix                     = "${var.snet-0-cidr}"
   resource_group_name                            = azurerm_resource_group.rg.name
   network_security_group_name                    = azurerm_network_security_group.web-snet-nsg.name
@@ -137,7 +134,6 @@ resource "azurerm_network_security_rule" "web-snet-nsg-denyall-out" {
 }
 
 # Associations
-
 resource "azurerm_subnet_network_security_group_association" "web-snet-nsg-assoc" {
   depends_on                                     = [azurerm_network_security_group.web-snet-nsg,
                                                    azurerm_subnet.web-snet]

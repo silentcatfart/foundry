@@ -8,6 +8,5 @@ resource "azurerm_storage_account" "storage" {
   account_kind                                   = "StorageV2"
   account_replication_type                       = "GRS"
   access_tier                                    = "Hot"
-
   tags                                           = "${(local.tags)}"
 }

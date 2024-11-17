@@ -13,4 +13,4 @@ I have rclone configured on the server. There's a cron job that stops the Foundr
 
 About [Foundry](https://foundryvtt.com/)
 
-![Foundry dice Image](https://github.com/silentcatfart/foundry/images/foundry-dice.webp)
+![Foundry dice Image](https://github.com/silentcatfart/foundry/images/foundry-dice.png)

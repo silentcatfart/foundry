@@ -7,7 +7,7 @@ resource "azurerm_public_ip" "pip-01" {
   location                          = var.location
   resource_group_name               = azurerm_resource_group.rg.name
   allocation_method                 = "Static"
-  sku                               = "Basic"
+  sku                               = "Standard"
   tags                              = "${(local.tags)}"
 }
 
@@ -20,7 +20,7 @@ resource "azurerm_public_ip" "pip-02" {
   location                          = var.location
   resource_group_name               = azurerm_resource_group.rg.name
   allocation_method                 = "Static"
-  sku                               = "Basic"
+  sku                               = "Standard"
   tags                              = "${(local.tags)}"
 }
 
@@ -33,6 +33,6 @@ resource "azurerm_public_ip" "pip-03" {
   location                          = var.location
   resource_group_name               = azurerm_resource_group.rg.name
   allocation_method                 = "Static"
-  sku                               = "Basic"
+  sku                               = "Standard"
   tags                              = "${(local.tags)}"
 }

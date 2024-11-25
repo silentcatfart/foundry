@@ -1,4 +1,5 @@
 ## LiveKit Server
+## Link for alerts on spot nodes - https://learn.microsoft.com/en-us/azure/azure-monitor/vm/tutorial-monitor-vm-alert-availability
 
 resource "azurerm_network_interface" "vm-01-nic" {
   depends_on                        = [azurerm_resource_group.rg,

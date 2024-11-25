@@ -30,6 +30,9 @@ resource "azurerm_linux_virtual_machine" "vm-01" {
   resource_group_name               = azurerm_resource_group.rg.name
   location                          = var.location
   size                              = var.vm-01-size
+  priority                          = "Spot"
+  eviction_policy                   = "Delete"
+  max_bid_price                     = -1
   admin_username                    = var.vm-admin
   network_interface_ids             = [azurerm_network_interface.vm-01-nic.id]
   custom_data                       = data.template_cloudinit_config.config.rendered
@@ -87,6 +90,9 @@ resource "azurerm_linux_virtual_machine" "vm-02" {
   resource_group_name               = azurerm_resource_group.rg.name
   location                          = var.location
   size                              = var.vm-02-size
+  priority                          = "Spot"
+  eviction_policy                   = "Delete"
+  max_bid_price                     = -1
   admin_username                    = var.vm-admin
   network_interface_ids             = [azurerm_network_interface.vm-02-nic.id]
 
@@ -169,6 +175,9 @@ resource "azurerm_linux_virtual_machine" "vm-03" {
   resource_group_name               = azurerm_resource_group.rg.name
   location                          = var.location
   size                              = var.vm-03-size
+  priority                          = "Spot"
+  eviction_policy                   = "Delete"
+  max_bid_price                     = -1
   admin_username                    = var.vm-admin
   network_interface_ids             = [azurerm_network_interface.vm-03-nic.id]
 

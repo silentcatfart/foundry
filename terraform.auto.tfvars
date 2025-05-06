@@ -22,7 +22,7 @@ location                        = "eastus2"
 vm-admin                        = "foundry"
 time-zone                       = "Eastern Standard Time"
 
-my-public-ip                    = "71.230.53.86"
+my-public-ip                    = "76.98.120.157"
 vnet-cidr                       = "10.250.0.0/24"
 snet-0-cidr                     = "10.250.0.0/24"
 

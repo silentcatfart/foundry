@@ -1,5 +1,4 @@
 // main.bicep nothing fancy here, just the basics.
-
 // parameters
 
 @description('The location for all resources.')
@@ -10,6 +9,16 @@ param deploymentTimestamp string = utcNow()
 
 @description('The prefix name for all resources.')
 param PrefixName string = 'foundry'
+
+@description('Storage account name - Storage Account naming rules - Lowercase letters and numbers')
+@minLength(3)
+@maxLength(24)
+param storageAccountName string = 'foundry${uniqueString(resourceGroup().id)}st'
+
+@description('Key Vault naming rules - Alphanumerics and hyphens. Start with a letter. End with letter or number. Cant contain consecutive hyphens')
+@minLength(3)
+@maxLength(24)
+param keyVaultName string = 'foundry${uniqueString(resourceGroup().id)}kv'
 
 @description('Storage kind')
 param storageKind string = 'StorageV2'
@@ -31,7 +40,6 @@ param adminPublicKey string = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDCS5iyFyDcG
 
 @description('My public IPv4 address')
 param myPublicIPv4 string = '69.249.125.110/32'
-
 
 //@description('Cloudflare CIDR IPs')
 //param cloudflareCIDR array = ['173.245.48.0/20'
@@ -70,10 +78,16 @@ param keyVaultAccessTenantId string = 'a8059119-87be-4583-9a4e-7fc59ec6cbf9'
 
 // variables
 
-var tags = union(resourceGroup().tags, {
-  CreatedBy: 'Bicep Template'
-  CreatedOn: deploymentTimestamp
-})
+// Safely inherit RG tags if they exist; otherwise use {}
+var rgTags = resourceGroup().?tags ?? {}
+
+var tags = union(
+  rgTags,
+  {
+    CreatedBy: 'Bicep Template'
+    CreatedOn: deploymentTimestamp
+  }
+)
 
 // Resources
 
@@ -82,7 +96,7 @@ var tags = union(resourceGroup().tags, {
 resource storageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
   kind: storageKind
   location: location
-  name: '${PrefixName}-st'
+  name: storageAccountName
   sku: {
     name: storageSku
   }
@@ -102,20 +116,21 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2025-01-01' = {
         }
       }
       keySource: 'Microsoft.Storage'
+      }
     }
   }
-}
 
 // Key Vaults
 
 resource keyVault 'Microsoft.KeyVault/vaults@2024-12-01-preview' = {
   location: location
-  name: '${PrefixName}-kv'
+  name: keyVaultName
   tags: tags
   properties: {
     accessPolicies: [
       {
         objectId: keyVaultAccessObjectId
+        tenantId: keyVaultAccessTenantId
         permissions: {
           certificates: [
             'all'
@@ -129,8 +144,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2024-12-01-preview' = {
           storage: [
             'all'
           ]
-        }
-        tenantId: keyVaultAccessTenantId
+        }        
       }      
     ]
       sku: {
@@ -140,9 +154,29 @@ resource keyVault 'Microsoft.KeyVault/vaults@2024-12-01-preview' = {
     enabledForDeployment: true
     enabledForDiskEncryption: true
     enabledForTemplateDeployment: true
-    enableRbacAuthorization: true
+    enableRbacAuthorization: false
     softDeleteRetentionInDays: 7
     tenantId: keyVaultAccessTenantId
+  }
+}
+
+// Key Vault Secret for Storage Account Key
+
+resource storageAccountKey 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
+  parent: keyVault
+  name: 'StorageAccountKey'
+  properties: {
+    value: storageAccount.listKeys().keys[0].value
+    contentType: 'Storage Account Key'
+  }
+}
+
+// Admin Public Key for Key Vault   
+resource adminPublicSSHKey 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
+  parent: keyVault
+  name: 'AdminPublicSSHKey'
+  properties: {
+    value: adminPublicKey // Use the adminPublicKey parameter value
   }
 }
 
@@ -153,6 +187,7 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2024-07-01' = {
   location: location
   properties: {
     securityRules: [
+
 //inbound rules
 
       {
@@ -244,7 +279,7 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2024-07-01' = {
         name: 'Deny-All-Internet-Outbound'
         properties: {
           description: 'Supercede default deny outbound to the Internet'
-          protocol: 'Tcp'
+          protocol: '*'
           sourcePortRange: '*'
           destinationPortRange: '*'
           sourceAddressPrefix: subnetAddressPrefix
@@ -288,8 +323,8 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
 
 // Public IP Addresses
 
-resource publicIPAddress01 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
-  name: '${PrefixName}-vm-01-pip'
+resource publicIPAddressdev 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
+  name: '${PrefixName}-dev-vm-pip'
   location: location
   sku: {
     name: 'Standard'
@@ -300,8 +335,8 @@ resource publicIPAddress01 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
   }
 }
 
-resource publicIPAddress02 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
-  name: '${PrefixName}-vm-02-pip'
+resource publicIPAddresstst 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
+  name: '${PrefixName}-tst-vm-pip'
   location: location
   sku: {
     name: 'Standard'
@@ -312,8 +347,8 @@ resource publicIPAddress02 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
   }
 }
 
-resource publicIPAddress03 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
-  name: '${PrefixName}-vm-03-pip'
+resource publicIPAddressprd 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
+  name: '${PrefixName}-prd-vm-pip'
   location: location
   sku: {
     name: 'Standard'
@@ -325,21 +360,21 @@ resource publicIPAddress03 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
 }
 
 // Network Interfaces
-resource networkInterface01 'Microsoft.Network/networkInterfaces@2024-07-01' = {
-  name: '${PrefixName}-vm-01-nic'
+resource networkInterfacedev 'Microsoft.Network/networkInterfaces@2024-07-01' = {
+  name: '${PrefixName}-dev-vm-nic'
   location: location
   tags: tags
   properties: {
     ipConfigurations: [
       {
-        name: '${PrefixName}-ipconfig'
+        name: '${PrefixName}-dev-ipconfig'
         properties: {
           privateIPAllocationMethod: 'Dynamic'
           subnet: {
             id: vnet.properties.subnets[0].id
           }
           publicIPAddress: {
-            id: publicIPAddress01.id
+            id: publicIPAddressdev.id
           }
         }
       }
@@ -347,21 +382,21 @@ resource networkInterface01 'Microsoft.Network/networkInterfaces@2024-07-01' = {
   }
 }
 
-resource networkInterface02 'Microsoft.Network/networkInterfaces@2024-07-01' = {
-  name: '${PrefixName}-vm-02-nic'
+resource networkInterfacetst 'Microsoft.Network/networkInterfaces@2024-07-01' = {
+  name: '${PrefixName}-tst-vm-nic'
   location: location
   tags: tags
   properties: {
     ipConfigurations: [
       {
-        name: '${PrefixName}-ipconfig'
+        name: '${PrefixName}-tst-ipconfig'
         properties: {
           privateIPAllocationMethod: 'Dynamic'
           subnet: {
             id: vnet.properties.subnets[0].id
           }
           publicIPAddress: {
-            id: publicIPAddress02.id
+            id: publicIPAddresstst.id
           }
         }
       }
@@ -369,21 +404,21 @@ resource networkInterface02 'Microsoft.Network/networkInterfaces@2024-07-01' = {
   }
 }
 
-resource networkInterface03 'Microsoft.Network/networkInterfaces@2024-07-01' = {
-  name: '${PrefixName}-vm-03-nic'
+resource networkInterfaceprd 'Microsoft.Network/networkInterfaces@2024-07-01' = {
+  name: '${PrefixName}-prd-vm-nic'
   location: location
   tags: tags
   properties: {
     ipConfigurations: [
       {
-        name: '${PrefixName}-ipconfig'
+        name: '${PrefixName}-prd-ipconfig'
         properties: {
           privateIPAllocationMethod: 'Dynamic'
           subnet: {
             id: vnet.properties.subnets[0].id
           }
           publicIPAddress: {
-            id: publicIPAddress03.id
+            id: publicIPAddressprd.id
           }
         }
       }
@@ -392,7 +427,8 @@ resource networkInterface03 'Microsoft.Network/networkInterfaces@2024-07-01' = {
 }
 
 // Virtual Machines
-resource virtualMachine01 'Microsoft.Compute/virtualMachines@2024-07-01' = {
+// development VM
+resource virtualMachinedev 'Microsoft.Compute/virtualMachines@2024-07-01' = {
   name: '${PrefixName}-dev-vm'
   location: location
   tags: tags
@@ -433,7 +469,7 @@ resource virtualMachine01 'Microsoft.Compute/virtualMachines@2024-07-01' = {
       networkProfile: {
         networkInterfaces: [
           {
-            id: networkInterface01.id
+            id: networkInterfacedev.id
           }
         ]
       }
@@ -455,7 +491,9 @@ resource virtualMachine01 'Microsoft.Compute/virtualMachines@2024-07-01' = {
     }
   }
  
-  resource virtualMachine02 'Microsoft.Compute/virtualMachines@2024-07-01' = {
+// test VM
+
+resource virtualMachinetst 'Microsoft.Compute/virtualMachines@2024-07-01' = {
   name: '${PrefixName}-tst-vm'
   location: location
   tags: tags
@@ -496,7 +534,7 @@ resource virtualMachine01 'Microsoft.Compute/virtualMachines@2024-07-01' = {
       networkProfile: {
         networkInterfaces: [
           {
-            id: networkInterface01.id
+            id: networkInterfacetst.id
           }
         ]
       }
@@ -518,7 +556,9 @@ resource virtualMachine01 'Microsoft.Compute/virtualMachines@2024-07-01' = {
     }
   }
 
-    resource virtualMachine03 'Microsoft.Compute/virtualMachines@2024-07-01' = {
+// production VM
+
+resource virtualMachineprd 'Microsoft.Compute/virtualMachines@2024-07-01' = {
   name: '${PrefixName}-prd-vm'
   location: location
   tags: tags
@@ -559,7 +599,7 @@ resource virtualMachine01 'Microsoft.Compute/virtualMachines@2024-07-01' = {
       networkProfile: {
         networkInterfaces: [
           {
-            id: networkInterface01.id
+            id: networkInterfaceprd.id
           }
         ]
       }

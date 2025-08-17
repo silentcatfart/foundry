@@ -153,6 +153,8 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2024-07-01' = {
   location: location
   properties: {
     securityRules: [
+//inbound rules
+
       {
         name: 'Allow-SSH-Inbound'
         properties: {
@@ -167,6 +169,49 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2024-07-01' = {
           direction: 'Inbound'
         }
       }
+      {
+        name: 'Allow-Foundry-Inbound'
+        properties: {
+          description: 'Ports needed to access Foundry'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRanges: ['80', '443', '30000']
+          sourceAddressPrefix: 'Internet'
+          destinationAddressPrefix: subnetAddressPrefix
+          access: 'Allow'
+          priority: 170
+          direction: 'Inbound'
+        }
+      }
+      {  
+        name: 'Allow-Livekit-Inbound'
+        properties: {
+          description: 'Ports needed to access LiveKit'
+          protocol: '*'
+          sourcePortRange: '*'
+          destinationPortRanges: ['50000-60000', '443', '80', '7881', '3478']
+          sourceAddressPrefix: 'Internet'
+          destinationAddressPrefix: subnetAddressPrefix
+          access: 'Allow'
+          priority: 180
+          direction: 'Inbound'
+        }
+      }
+        {  
+        name: 'Allow-Intra-Subnet-Inbound'
+        properties: {
+          description: 'Allow traffic between VMs within the same subnet'
+          protocol: '*'
+          sourcePortRange: '*'
+          destinationPortRange: '*'
+          sourceAddressPrefix: subnetAddressPrefix
+          destinationAddressPrefix: subnetAddressPrefix
+          access: 'Allow'
+          priority: 200
+          direction: 'Inbound'
+        }
+      }         
+//outbound rules            
       {
         name: 'AllowInternetOutbound'
         properties: {

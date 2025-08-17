@@ -27,14 +27,11 @@ param dataDiskSizeGB int = 64
 @description('Admin username for the VM')
 param adminUsername string = 'foundry'
 
-@description('Timezone for the VM')
-param timeZone string = 'Eastern Standard Time'
-
 @description('My public SSH key')
 param adminPublicKey string = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDCS5iyFyDcG8hAvYwQjEzijmGeJibEEuZ57WfZ0QzivUScWbF0vYtglpiXv9cxlclDGc6J2ehWdOvsg/beR89iN2dUHxQsoBDhkwBeSeuUa8NQCMsm3BdxqNW+R/PQzahGzcOQ0UNsdlj+U57AFnGStaogErR5o5rjhNEF9j4bpugGHIkMQY7SnEVpAPHypmvAb9WMU4uGnO0LqH5kZy3dA2XLsGCtfhlzst7p0MXNkoZqaWMwoXSVvaJjYFqNzfJW2WVkpbSdpa1mfNI/g0R7PT4Pm59HiF7y5Ex7HWczLkqp54LZwMaWR4Km7Brz0V4hidSBXm+eAPSgx0/CX1BmYfGfJ2yifd2EtdIVORY5btNAdstUtD1B6L0SH80hLuvFr9dYHsWFVLkOaeYypr/k0RWOiSFVip4DrKT2nGew194/jD/YIm/GuN97+qukxF7UVpqlJvfEW1wzTl7WwAceuJ90vi7gSvRRdwaSkVjxDLgGhnqSHcnIguTTcLGyuiNKGyW2nibTnTZqCYThYuOpHJ/3nBpPYuO9rjI8nayz7E7BBl3XxBrjzwiuffcMrY0Hwzatsm4W9ALl6lvRyzFOOW7lvc18UJjQ9c7BI5bCO4CGtFAjs0fejdfR9udDkSn1cbhMBi+8kMnPg4b4RKV6bl6P//MlBUhakIA7yUVaZw== aengleman@ASENj893Q13'
 
 @description('My public IPv4 address')
-param myPublicIPv4 string = '69.249.125.110'
+param myPublicIPv4 string = '69.249.125.110/32'
 
 
 //@description('Cloudflare CIDR IPs')
@@ -158,16 +155,16 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2024-07-01' = {
   properties: {
     securityRules: [
       {
-        name: 'AllowSSH'
+        name: 'Allow-SSH-Inbound'
         properties: {
-          description: 'Allow SSH from Internet'
+          description: 'Needed for administering the server'
           protocol: 'Tcp'
           sourcePortRange: '*'
           destinationPortRange: '22'
-          sourceAddressPrefix: '*'
-          destinationAddressPrefix: '*'
+          sourceAddressPrefix: myPublicIPv4
+          destinationAddressPrefix: subnetAddressPrefix
           access: 'Allow'
-          priority: 1000
+          priority: 160
           direction: 'Inbound'
         }
       }
@@ -327,6 +324,9 @@ resource virtualMachine01 'Microsoft.Compute/virtualMachines@2024-07-01' = {
   name: '${PrefixName}-dev-vm'
   location: location
   tags: tags
+  zones:  [
+    '1'
+  ]
   properties: {
     hardwareProfile: {
       vmSize: vmSize
@@ -343,16 +343,17 @@ resource virtualMachine01 'Microsoft.Compute/virtualMachines@2024-07-01' = {
         caching: 'ReadWrite'
         createOption: 'FromImage'
         managedDisk: {
-          storageAccountType: storageSku
+          storageAccountType: 'Standard_LRS'
         }
       }
         dataDisks: [
           {
+            name: '${PrefixName}-dev-vm-datadisk'
             lun: 0
             diskSizeGB: dataDiskSizeGB
             createOption: 'Empty'
             managedDisk: {
-              storageAccountType: storageSku
+              storageAccountType: 'Standard_LRS'
             }
           }
         ]
@@ -366,6 +367,132 @@ resource virtualMachine01 'Microsoft.Compute/virtualMachines@2024-07-01' = {
       }
       osProfile: {
         computerName: '${PrefixName}-dev-vm'
+        adminUsername: adminUsername
+        linuxConfiguration: {
+          disablePasswordAuthentication: true
+          ssh: {
+            publicKeys: [
+              {
+                path: '/home/${adminUsername}/.ssh/authorized_keys'
+                keyData: adminPublicKey
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+ 
+  resource virtualMachine02 'Microsoft.Compute/virtualMachines@2024-07-01' = {
+  name: '${PrefixName}-tst-vm'
+  location: location
+  tags: tags
+  zones:  [
+    '2'
+  ]
+  properties: {
+    hardwareProfile: {
+      vmSize: vmSize
+    }
+    storageProfile: {
+      imageReference: {
+        publisher: 'Canonical'
+        offer: '0001-com-ubuntu-server-jammy'
+        sku: '22_04-lts-gen2'
+        version: 'latest'
+      }
+      osDisk: {
+        name: '${PrefixName}-tst-vm-osdisk'
+        caching: 'ReadWrite'
+        createOption: 'FromImage'
+        managedDisk: {
+          storageAccountType: 'Standard_LRS'
+        }
+      }
+        dataDisks: [
+          {
+            name: '${PrefixName}-tst-vm-datadisk'
+            lun: 0
+            diskSizeGB: dataDiskSizeGB
+            createOption: 'Empty'
+            managedDisk: {
+              storageAccountType: 'Standard_LRS'
+            }
+          }
+        ]
+      }
+      networkProfile: {
+        networkInterfaces: [
+          {
+            id: networkInterface01.id
+          }
+        ]
+      }
+      osProfile: {
+        computerName: '${PrefixName}-tst-vm'
+        adminUsername: adminUsername
+        linuxConfiguration: {
+          disablePasswordAuthentication: true
+          ssh: {
+            publicKeys: [
+              {
+                path: '/home/${adminUsername}/.ssh/authorized_keys'
+                keyData: adminPublicKey
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+
+    resource virtualMachine03 'Microsoft.Compute/virtualMachines@2024-07-01' = {
+  name: '${PrefixName}-prd-vm'
+  location: location
+  tags: tags
+  zones:  [
+    '3'
+  ]
+  properties: {
+    hardwareProfile: {
+      vmSize: vmSize
+    }
+    storageProfile: {
+      imageReference: {
+        publisher: 'Canonical'
+        offer: '0001-com-ubuntu-server-jammy'
+        sku: '22_04-lts-gen2'
+        version: 'latest'
+      }
+      osDisk: {
+        name: '${PrefixName}-prd-vm-osdisk'
+        caching: 'ReadWrite'
+        createOption: 'FromImage'
+        managedDisk: {
+          storageAccountType: 'Standard_LRS'
+        }
+      }
+        dataDisks: [
+          {
+            name: '${PrefixName}-prd-vm-datadisk'
+            lun: 0
+            diskSizeGB: dataDiskSizeGB
+            createOption: 'Empty'
+            managedDisk: {
+              storageAccountType: 'Standard_LRS'
+            }
+          }
+        ]
+      }
+      networkProfile: {
+        networkInterfaces: [
+          {
+            id: networkInterface01.id
+          }
+        ]
+      }
+      osProfile: {
+        computerName: '${PrefixName}-prd-vm'
         adminUsername: adminUsername
         linuxConfiguration: {
           disablePasswordAuthentication: true

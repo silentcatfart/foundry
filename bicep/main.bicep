@@ -210,22 +210,50 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2024-07-01' = {
           priority: 200
           direction: 'Inbound'
         }
-      }         
-//outbound rules            
-      {
-        name: 'AllowInternetOutbound'
+      }
+        {  
+        name: 'Deny-All-Inbound'
         properties: {
-          description: 'Allow outbound to Internet'
+          description: 'Supercede default deny'
           protocol: '*'
           sourcePortRange: '*'
           destinationPortRange: '*'
           sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+          access: 'Deny'
+          priority: 4096
+          direction: 'Inbound'
+        }
+      }               
+//outbound rules            
+      {
+        name: 'Allow-Web-Browsing-Outbound'
+        properties: {
+          description: 'Allow outbound web access to the Internet'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRanges: ['80', '443']
+          sourceAddressPrefix: subnetAddressPrefix
           destinationAddressPrefix: 'Internet'
           access: 'Allow'
-          priority: 1000
+          priority: 100
           direction: 'Outbound'
         }
       }
+      {
+        name: 'Deny-All-Internet-Outbound'
+        properties: {
+          description: 'Supercede default deny outbound to the Internet'
+          protocol: 'Tcp'
+          sourcePortRange: '*'
+          destinationPortRange: '*'
+          sourceAddressPrefix: subnetAddressPrefix
+          destinationAddressPrefix: 'Internet'
+          access: 'Deny'
+          priority: 4096
+          direction: 'Outbound'
+        }
+      }      
     ]
   }
 }

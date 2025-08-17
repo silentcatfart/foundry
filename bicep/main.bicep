@@ -1,5 +1,4 @@
 // main.bicep nothing fancy here, just the basics.
-// uses main.bicepparam for parameters
 
 // parameters
 

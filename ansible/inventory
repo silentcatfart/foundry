@@ -1,5 +1,11 @@
-[tst]
-new.foundry.silentcatfart.com
+## for testing new versions
+[dev]
+dev.foundry.silentcatfart.com
 
+## for building compendiums
+[tst]
+tst.foundry.silentcatfart.com
+
+## for running games
 [prd]
-foundry.silentcatfart.com
+prd.foundry.silentcatfart.com

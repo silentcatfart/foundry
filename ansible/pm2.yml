@@ -1,5 +1,5 @@
 ---
-- hosts: [tst]
+- hosts: [all]
   become: true
   gather_facts: false
 
@@ -10,6 +10,6 @@
       - name: Install pm2
         ansible.builtin.shell:
           cmd: |
-            sudo npm install pm2 -g
+            sudo npm install pm2@latest -g
             pm2 startup
             sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u foundry --hp /home/foundry

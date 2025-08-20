@@ -1,5 +1,5 @@
 ---
-- hosts: [tst]
+- hosts: [all]
   become: true
   gather_facts: false
 
@@ -7,24 +7,108 @@
     - var-secrets.yml
 
   tasks:
-      - name: Create rclone-local-to-az script
+## Routine backup to blob storage
+      - name: Create rclone-local-to-az script (dev)
         copy:
           content: |
              #!/bin/bash
              pm2 stop foundry
-             /usr/bin/rclone sync /home/foundry/foundrydrive "azure blob":foundry-new
+             /usr/bin/rclone sync /home/foundry/foundrydrive "azure blob":dev --copy-links --exclude "**/age-shared/**"
              pm2 start foundry
           dest: /home/foundry/rclone-local-to-az
           force: no
           mode: '777'
+        when: inventory_hostname == 'dev.foundry.silentcatfart.com'  
 
-      - name: Create rclone-az-to-local script
+      - name: Create rclone-local-to-az script (tst)
         copy:
           content: |
              #!/bin/bash
              pm2 stop foundry
-             /usr/bin/rclone sync "azure blob":foundry-new /home/foundry/foundrydrive
+             /usr/bin/rclone sync /home/foundry/foundrydrive "azure blob":tst --copy-links --exclude "**/age-shared/**"
              pm2 start foundry
+          dest: /home/foundry/rclone-local-to-az
+          force: no
+          mode: '777'
+        when: inventory_hostname == 'tst.foundry.silentcatfart.com' 
+
+      - name: Create rclone-local-to-az script (prd)
+        copy:
+          content: |
+             #!/bin/bash
+             pm2 stop foundry
+             /usr/bin/rclone sync /home/foundry/foundrydrive "azure blob":prd --copy-links --exclude "**/age-shared/**"
+             pm2 start foundry
+          dest: /home/foundry/rclone-local-to-az
+          force: no
+          mode: '777'
+        when: inventory_hostname == 'prd.foundry.silentcatfart.com' 
+
+## Initally used to download data from blob storage to local drive on fresh installs or recovery - commented by default
+      - name: Create rclone-az-to-local script (dev)
+        copy:
+          content: |
+             #!/bin/bash
+             #pm2 stop foundry
+             #/usr/bin/rclone sync "azure blob":dev /home/foundry/foundrydrive
+             #pm2 start foundry
           dest: /home/foundry/rclone-az-to-local
           force: no
           mode: '777'
+        when: inventory_hostname == 'dev.foundry.silentcatfart.com'
+
+      - name: Create rclone-az-to-local script (tst)
+        copy:
+          content: |
+             #!/bin/bash
+             #pm2 stop foundry
+             #/usr/bin/rclone sync "azure blob":tst /home/foundry/foundrydrive
+             #pm2 start foundry
+          dest: /home/foundry/rclone-az-to-local
+          force: no
+          mode: '777'
+        when: inventory_hostname == 'tst.foundry.silentcatfart.com'
+
+      - name: Create rclone-az-to-local script (prd)
+        copy:
+          content: |
+             #!/bin/bash
+             #pm2 stop foundry
+             #/usr/bin/rclone sync "azure blob":prd /home/foundry/foundrydrive
+             #pm2 start foundry
+          dest: /home/foundry/rclone-az-to-local
+          force: no
+          mode: '777'
+        when: inventory_hostname == 'prd.foundry.silentcatfart.com'
+
+## Download compendium content from blob storage to local drive
+      - name: Create rclone-az-compendium-to-local script (dev)
+        copy:
+          content: |
+             #!/bin/bash
+              /usr/bin/rclone sync "azure blob":age-shared /home/foundry/foundrydrive/foundryuserdata/Data/age-shared
+          dest: /home/foundry/rclone-az-compendium-to-local
+          force: no
+          mode: '777'
+        when: inventory_hostname == 'dev.foundry.silentcatfart.com'
+
+      - name: Create rclone-az-compendium-to-local script (prd)
+        copy:
+          content: |
+             #!/bin/bash
+              /usr/bin/rclone sync "azure blob":age-shared /home/foundry/foundrydrive/foundryuserdata/Data/age-shared
+          dest: /home/foundry/rclone-az-compendium-to-local
+          force: no
+          mode: '777'
+        when: inventory_hostname == 'prd.foundry.silentcatfart.com'        
+
+## Upload compendium content from local drive to blob storage for module development
+      - name: Create rclone-local-az-compendium script (tst)
+        copy:
+          content: |
+             #!/bin/bash
+              /usr/bin/rclone sync /home/foundry/foundrydrive/foundryuserdata/Data/age-shared "azure blob":age-shared
+          dest: /home/foundry/rclone-local-az-compendium
+          force: no
+          mode: '777'
+        when: inventory_hostname == 'tst.foundry.silentcatfart.com'

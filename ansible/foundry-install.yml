@@ -1,5 +1,5 @@
 ---
-- hosts: [tst]
+- hosts: [all]
   become: false
   gather_facts: false
 
@@ -14,11 +14,26 @@
             mkdir foundry
             mkdir foundryuserdata
 
-      - name: Download foundry
+      - name: Download foundry (dev)
+        ansible.builtin.shell:
+          chdir: /home/foundry
+          cmd: |
+            wget --output-document /home/foundry/foundrydrive/foundry/foundryvtt.zip {{ foundry_beta_url }}
+        when: inventory_hostname == 'dev.foundry.silentcatfart.com'    
+
+      - name: Download foundry (tst)
         ansible.builtin.shell:
           chdir: /home/foundry
           cmd: |
             wget --output-document /home/foundry/foundrydrive/foundry/foundryvtt.zip {{ foundry_url }}
+        when: inventory_hostname == 'tst.foundry.silentcatfart.com'    
+
+      - name: Download foundry (prd)
+        ansible.builtin.shell:
+          chdir: /home/foundry
+          cmd: |
+            wget --output-document /home/foundry/foundrydrive/foundry/foundryvtt.zip {{ foundry_url }}
+        when: inventory_hostname == 'prd.foundry.silentcatfart.com'    
 
       - name: Unzip foundry
         ansible.builtin.shell:
@@ -33,3 +48,8 @@
           cmd: |
             pm2 start "node /home/foundry/foundrydrive/foundry/resources/app/main.js --dataPath=/home/foundry/foundrydrive/foundryuserdata" --name foundry
             pm2 save
+
+      - name: Pause for 300 seconds while foundry service builds out user data path
+        ansible.builtin.pause:
+          seconds: 300
+      

@@ -1,5 +1,5 @@
 ---
-- hosts: [tst]
+- hosts: [all]
   become: false
   gather_facts: false
 
@@ -24,11 +24,26 @@
           regexp: '"proxySSL": false,'
           replace: '"proxySSL": true,'
 
-      - name: Update options.json hostname
+      - name: Update options.json hostname (dev)
         replace:
           path: /home/foundry/foundrydrive/foundryuserdata/Config/options.json
           regexp: '"hostname": null,'
-          replace: '"hostname": "new.foundry.silentcatfart.com",'
+          replace: '"hostname": "dev.foundry.silentcatfart.com",'
+        when: inventory_hostname == 'dev.foundry.silentcatfart.com'
+
+      - name: Update options.json hostname (tst)
+        replace:
+          path: /home/foundry/foundrydrive/foundryuserdata/Config/options.json
+          regexp: '"hostname": null,'
+          replace: '"hostname": "tst.foundry.silentcatfart.com",'
+        when: inventory_hostname == 'tst.foundry.silentcatfart.com'
+
+      - name: Update options.json hostname (prd)
+        replace:
+          path: /home/foundry/foundrydrive/foundryuserdata/Config/options.json
+          regexp: '"hostname": null,'
+          replace: '"hostname": "prd.foundry.silentcatfart.com",'
+        when: inventory_hostname == 'prd.foundry.silentcatfart.com'                      
 
       - name: Start foundry
         ansible.builtin.shell:

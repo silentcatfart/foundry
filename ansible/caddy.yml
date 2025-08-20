@@ -1,5 +1,5 @@
 ---
-- hosts: [tst]
+- hosts: [all]
   become: true
   gather_facts: true
 
@@ -7,7 +7,7 @@
     - var-secrets.yml
 
   tasks:
-      - name: Create caddy config
+      - name: Create caddy config (dev)
         copy:
           content: |
              # This replaces the existing content in /etc/caddy/Caddyfile
@@ -24,7 +24,7 @@
              encode zstd gzip
              }
 
-             new.foundry.silentcatfart.com {
+             dev.foundry.silentcatfart.com {
              # PROXY ALL REQUEST TO PORT 30000
              reverse_proxy localhost:30000
              encode zstd gzip
@@ -35,6 +35,67 @@
           dest: /etc/caddy/Caddyfile
           force: yes
           mode: '644'
+        when: inventory_hostname == 'dev.foundry.silentcatfart.com'
+
+      - name: Create caddy config (tst)
+        copy:
+          content: |
+             # This replaces the existing content in /etc/caddy/Caddyfile
+             # A CONFIG SECTION FOR YOUR IP AND HOSTNAME
+
+             {
+             default_sni {{ ansible_default_ipv4.address }}
+             }
+
+             {{ ansible_default_ipv4.address }} {
+             # PROXY ALL REQUEST TO PORT 30000
+             tls internal
+             reverse_proxy localhost:30000
+             encode zstd gzip
+             }
+
+             tst.foundry.silentcatfart.com {
+             # PROXY ALL REQUEST TO PORT 30000
+             reverse_proxy localhost:30000
+             encode zstd gzip
+             }
+
+             # Refer to the Caddy docs for more information:
+             # https://caddyserver.com/docs/caddyfile
+          dest: /etc/caddy/Caddyfile
+          force: yes
+          mode: '644'
+        when: inventory_hostname == 'tst.foundry.silentcatfart.com'
+
+      - name: Create caddy config (prd)
+        copy:
+          content: |
+             # This replaces the existing content in /etc/caddy/Caddyfile
+             # A CONFIG SECTION FOR YOUR IP AND HOSTNAME
+
+             {
+             default_sni {{ ansible_default_ipv4.address }}
+             }
+
+             {{ ansible_default_ipv4.address }} {
+             # PROXY ALL REQUEST TO PORT 30000
+             tls internal
+             reverse_proxy localhost:30000
+             encode zstd gzip
+             }
+
+             prd.foundry.silentcatfart.com {
+             # PROXY ALL REQUEST TO PORT 30000
+             reverse_proxy localhost:30000
+             encode zstd gzip
+             }
+
+             # Refer to the Caddy docs for more information:
+             # https://caddyserver.com/docs/caddyfile
+          dest: /etc/caddy/Caddyfile
+          force: yes
+          mode: '644'
+        when: inventory_hostname == 'prd.foundry.silentcatfart.com'
 
       - name: Restart caddy
         ansible.builtin.shell:

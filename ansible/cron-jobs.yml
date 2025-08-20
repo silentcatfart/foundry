@@ -1,5 +1,5 @@
 ---
-- hosts: [tst]
+- hosts: [all]
   become: true
   gather_facts: false
 
@@ -15,3 +15,24 @@
         job: "/home/foundry/rclone-local-to-az"
         user: foundry
         disabled: true
+
+    - name: Nightly compendium download from Azure Storage (prd)"
+      ansible.builtin.cron:
+        name: "az-dowload"
+        minute: "00"
+        hour: "1"
+        job: "/home/foundry/rclone-az-compendium-to-local"
+        user: foundry
+        disabled: true
+      when: inventory_hostname == 'prd.foundry.silentcatfart.com'  
+
+    - name: Nightly compendium download from Azure Storage (dev)"
+      ansible.builtin.cron:
+        name: "az-dowload"
+        minute: "00"
+        hour: "1"
+        job: "/home/foundry/rclone-az-compendium-to-local"
+        user: foundry
+        disabled: true
+      when: inventory_hostname == 'dev.foundry.silentcatfart.com'
+          

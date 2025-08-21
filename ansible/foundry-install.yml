@@ -7,12 +7,12 @@
     - var-secrets.yml
 
   tasks:
-#      - name: Make foundry directories
-#        ansible.builtin.shell:
-#          chdir: foundrydrive
-#          cmd: |
-#            mkdir foundry
-#            mkdir foundryuserdata
+      - name: Make foundry directories
+        ansible.builtin.shell:
+          chdir: foundrydrive
+          cmd: |
+            mkdir foundry
+            mkdir foundryuserdata
 
       - name: Download foundry (dev)
         ansible.builtin.shell:

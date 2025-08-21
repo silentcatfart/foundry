@@ -1,4 +1,4 @@
-# Foundry VTT - Terraform and Ansible for Azure Hosting
+# Foundry VTT - Terraform, Bicep and Ansible for Azure Hosting
 
 Provision artifacts used to self-host a [Foundry Virtual Table Top](https://foundryvtt.com/) environment:
 

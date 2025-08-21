@@ -7,12 +7,12 @@
     - var-secrets.yml
 
   tasks:
-      - name: Make foundry directories
-        ansible.builtin.shell:
-          chdir: foundrydrive
-          cmd: |
-            mkdir foundry
-            mkdir foundryuserdata
+#      - name: Make foundry directories
+#        ansible.builtin.shell:
+#          chdir: foundrydrive
+#          cmd: |
+#            mkdir foundry
+#            mkdir foundryuserdata
 
       - name: Download foundry (dev)
         ansible.builtin.shell:
@@ -49,7 +49,7 @@
             pm2 start "node /home/foundry/foundrydrive/foundry/resources/app/main.js --dataPath=/home/foundry/foundrydrive/foundryuserdata" --name foundry
             pm2 save
 
-      - name: Pause for 300 seconds while foundry service builds out user data path
+      - name: Pause for 120 seconds while foundry service builds out user data path
         ansible.builtin.pause:
-          seconds: 300
+          seconds: 120
       

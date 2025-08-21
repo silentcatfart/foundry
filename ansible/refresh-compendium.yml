@@ -1,0 +1,34 @@
+---
+- hosts: [prd.foundry.silentcatfart.com, dev.foundry.silentcatfart.com]
+  become: true
+  gather_facts: false
+
+  vars_files:
+    - var-secrets.yml
+
+  tasks:
+      - name: Create rclone-az-compendium-to-local.service
+        copy:
+          content: |
+            ## /etc/systemd/system/rclone-az-compendium-to-local.service
+
+            [Unit]
+            After=network.target
+
+            [Service]
+            User=root
+            Environment=RCLONE_CONFIG=/home/foundry/.config/rclone/rclone.conf
+            ExecStart=/usr/bin/rclone sync "azure blob":age-shared /home/foundry/foundrydrive/foundryuserdata/Data/age-shared \
+              --log-file /var/log/rclone-az.log --log-level DEBUG
+
+            [Install]
+            WantedBy=default.target
+          dest: /etc/systemd/system/rclone-az-compendium-to-local.service
+          force: no
+
+      - name: Enable service
+        ansible.builtin.shell:
+          cmd: |
+            sudo chmod 664 /etc/systemd/system/rclone-az-compendium-to-local.service
+            sudo systemctl daemon-reload
+            sudo systemctl enable rclone-az-compendium-to-local.service

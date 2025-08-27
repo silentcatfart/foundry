@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - '/bicep/deploy/**'
+      - 'bicep/deploy/**'
       - '.github/workflows/**'
 
 permissions:

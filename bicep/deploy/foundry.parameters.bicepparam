@@ -1,26 +1,12 @@
-// reference to main Bicep file
 using 'foundry.bicep'
 
 param resourceGroupName = 'foundry-rg'
-//param resourceGroupLocation = 'eastus2'
-/*
-param storageLocation = resourceGroupLocation
-param storageName = 'fndryvttstorage'
-param storageKind = 'StorageV2'
-param storageSku = 'Standard_GRS'
-*/
 
 param tagValues = {
   Project: 'Foundry-VTT'
   Environment: 'Production'
   CreatedBy: 'Bicep Template'
 }
-/*
-param keyVaultLocation = resourceGroupLocation
-param keyVaultName = 'fndryvttkv'
-param keyVaultAccessObjectId = '1d1d86b3-58ff-44c9-9443-f64fc2722bc9' 
-param keyVaultAccessTenantId = 'a8059119-87be-4583-9a4e-7fc59ec6cbf9'
-*/
 
 param PrefixName = 'fndry'
 param virtualNetworkLocation = 'eastus2'

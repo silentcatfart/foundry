@@ -1,18 +1,7 @@
 targetScope='subscription'
 
 param resourceGroupName string
-//param resourceGroupLocation string
 param tagValues object
-/*
-param storageLocation string
-param storageName string
-param storageKind string
-param storageSku string
-param keyVaultLocation string
-param keyVaultName string
-param keyVaultAccessObjectId string
-param keyVaultAccessTenantId string
-*/
 param PrefixName string
 param virtualNetworkLocation string
 param myPublicIPv4 string
@@ -27,40 +16,8 @@ param adminUsername string
 param adminPublicKey string
 
 resource newRG 'Microsoft.Resources/resourceGroups@2025-04-01' existing = {
-//  name: 'foundry-rg'
-    name: resourceGroupName
+  name: resourceGroupName
 }
-/*
-resource _storageAcct 'Microsoft.Storage/storageAccounts@2024-01-01' existing = {
-  name: 'fndryst'
-  scope: newRG
-}
-
-module storageModule './modules/storage.bicep' = {
-  name: 'storageModule'
-  scope: newRG
-  params: {
-    storageLocation: storageLocation
-    storageName: storageName
-    storageKind: storageKind
-    storageSku: storageSku
-    tagValues: tagValues
-  }
-}
-
-
-module keyVaultModule './modules/keyvault.bicep' = {
-  name: 'keyVaultModule'
-  scope: newRG
-  params: {
-    keyVaultLocation: keyVaultLocation
-    keyVaultName: keyVaultName
-    keyVaultAccessObjectId: keyVaultAccessObjectId
-    keyVaultAccessTenantId: keyVaultAccessTenantId
-    tagValues: tagValues
-  }
-}
-*/
 
 module virtualNetworkModule '../modules/vnet.bicep' = {
   name: 'virtualNetworkModule'

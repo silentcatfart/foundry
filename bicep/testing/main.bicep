@@ -2,17 +2,15 @@ targetScope='subscription'
 
 param resourceGroupName string
 param resourceGroupLocation string
-param tagValues object
-/*
 param storageLocation string
 param storageName string
 param storageKind string
 param storageSku string
+param tagValues object
 param keyVaultLocation string
 param keyVaultName string
 param keyVaultAccessObjectId string
 param keyVaultAccessTenantId string
-*/
 param PrefixName string
 param virtualNetworkLocation string
 param myPublicIPv4 string
@@ -26,16 +24,13 @@ param dataDiskSizeGB int
 param adminUsername string
 param adminPublicKey string
 
-resource newRG 'Microsoft.Resources/resourceGroups@2025-04-01' existing = {
-  name: 'foundry-rg'
+resource newRG 'Microsoft.Resources/resourceGroups@2025-04-01' = {
+  name: resourceGroupName
+  location: resourceGroupLocation
+  tags: tagValues
 }
 
-resource storageAcct 'Microsoft.Storage/storageAccounts@2024-01-01' existing = {
-  name: 'fndryst'
-  scope: newRG
-}
-/*
-module storageModule './modules/storage.bicep' = {
+module storageModule '../modules/storage.bicep' = {
   name: 'storageModule'
   scope: newRG
   params: {
@@ -47,8 +42,7 @@ module storageModule './modules/storage.bicep' = {
   }
 }
 
-
-module keyVaultModule './modules/keyvault.bicep' = {
+module keyVaultModule '../modules/keyvault.bicep' = {
   name: 'keyVaultModule'
   scope: newRG
   params: {
@@ -59,9 +53,8 @@ module keyVaultModule './modules/keyvault.bicep' = {
     tagValues: tagValues
   }
 }
-*/
 
-module virtualNetworkModule './modules/vnet.bicep' = {
+module virtualNetworkModule '../modules/vnet.bicep' = {
   name: 'virtualNetworkModule'
   scope: newRG
   params: {
@@ -76,7 +69,7 @@ module virtualNetworkModule './modules/vnet.bicep' = {
   }
 }
 
-module publicIPModule './modules/publicip.bicep' = {
+module publicIPModule '../modules/publicip.bicep' = {
   name: 'publicIPModule'
   scope: newRG
   params: {
@@ -86,7 +79,7 @@ module publicIPModule './modules/publicip.bicep' = {
   }
 }
 
-module linuxVmModule './modules/linuxvm.bicep' = {
+module linuxVmModule '../modules/linuxvm.bicep' = {
   name: 'linuxVmModule'
   scope: newRG
   params: {

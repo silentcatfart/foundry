@@ -15,16 +15,5 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2025-02
   }
 }
 
-// Provide the list of table names as a parameter
-param logAnalyticsTableNames array = []
-
-// Update the retention for each table
-resource updatedLogAnalyticsTables 'Microsoft.OperationalInsights/workspaces/tables@2025-02-01' = [for tableName in logAnalyticsTableNames: {
-  name: tableName
-  properties: {
-    retentionInDays: 30
-  }
-}]
-
 output logAnalyticsWorkspaceId string = logAnalyticsWorkspace.id
 output logAnalyticsWorkspaceName string = logAnalyticsWorkspace.name

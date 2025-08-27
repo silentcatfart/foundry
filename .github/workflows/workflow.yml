@@ -6,7 +6,7 @@ on:
     branches:
       - main
     paths:
-      - 'deploy/**'
+      - '/bicep/deploy/**'
       - '.github/workflows/**'
 
 permissions:
@@ -31,5 +31,5 @@ jobs:
         scope: resourcegroup
         resourceGroupName: ${{ env.AZURE_RESOURCEGROUP_NAME }}
         deploymentName: ${{ github.run_number }}
-        template: ./deploy/foundry.bicep
-        parameters: ./deploy/foundry.parameters.bicepparam 
+        template: ./bicep/deploy/foundry.bicep
+        parameters: ./bicep/deploy/foundry.parameters.bicepparam 

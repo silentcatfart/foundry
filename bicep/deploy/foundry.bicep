@@ -14,6 +14,8 @@ param vmSize string
 param dataDiskSizeGB int
 param adminUsername string
 param adminPublicKey string
+param logAnalyticsWorkspaceLocation string
+param logAnalSku string
 
 resource newRG 'Microsoft.Resources/resourceGroups@2025-04-01' existing = {
   name: resourceGroupName
@@ -59,6 +61,17 @@ module linuxVmModule '../modules/linuxvm.bicep' = {
     dataDiskSizeGB: dataDiskSizeGB
     adminUsername: adminUsername
     adminPublicKey: adminPublicKey
+  }
+}
+
+module logAnalyticsWorkspaceModule '../modules/loganalyticsws.bicep' = {
+  name: 'logAnalyticsWorkspaceModule'
+  scope: newRG
+  params: {
+    location: logAnalyticsWorkspaceLocation
+    PrefixName : PrefixName 
+    tagValues: tagValues
+    logAnalSku: logAnalSku
   }
 }
 

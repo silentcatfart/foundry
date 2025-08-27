@@ -1,7 +1,7 @@
 targetScope='subscription'
 
 param resourceGroupName string
-param resourceGroupLocation string
+//param resourceGroupLocation string
 param tagValues object
 /*
 param storageLocation string
@@ -27,14 +27,15 @@ param adminUsername string
 param adminPublicKey string
 
 resource newRG 'Microsoft.Resources/resourceGroups@2025-04-01' existing = {
-  name: 'foundry-rg'
+//  name: 'foundry-rg'
+    name: resourceGroupName
 }
-
-resource storageAcct 'Microsoft.Storage/storageAccounts@2024-01-01' existing = {
+/*
+resource _storageAcct 'Microsoft.Storage/storageAccounts@2024-01-01' existing = {
   name: 'fndryst'
   scope: newRG
 }
-/*
+
 module storageModule './modules/storage.bicep' = {
   name: 'storageModule'
   scope: newRG

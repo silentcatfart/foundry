@@ -2,7 +2,7 @@
 using 'foundry.bicep'
 
 param resourceGroupName = 'foundry-rg'
-param resourceGroupLocation = 'eastus2'
+//param resourceGroupLocation = 'eastus2'
 /*
 param storageLocation = resourceGroupLocation
 param storageName = 'fndryvttstorage'
@@ -23,14 +23,14 @@ param keyVaultAccessTenantId = 'a8059119-87be-4583-9a4e-7fc59ec6cbf9'
 */
 
 param PrefixName = 'fndry'
-param virtualNetworkLocation = resourceGroupLocation
+param virtualNetworkLocation = 'eastus2'
 param myPublicIPv4 = '69.249.125.110/32'
 param virtualNetworkName  = '${PrefixName}-vnet'
 param virtualNetworkAddressPrefix = '10.250.0.0/24'
 param subnetName = '${PrefixName}-subnet'
 param subnetAddressPrefix = '10.250.0.0/24'
 
-param publicIPLocation = resourceGroupLocation
+param publicIPLocation = 'eastus2'
 
 param vmSize = 'Standard_B1ms'
 param dataDiskSizeGB = 64

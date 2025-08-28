@@ -37,7 +37,7 @@ resource rule 'Microsoft.Insights/scheduledQueryRules@2025-01-01-preview' = {
     enabled: true
     evaluationFrequency: 'PT30M' // check every 30 minutes
     windowSize: 'PT4H'           // 4-hour lookback
-    overrideQueryTimeRange: 'P7D'  // allow the query to look 7 days back for the last start
+    overrideQueryTimeRange: 'P2D'   // <= max allowed
     scopes: [
       logAnalyticsWorkspace.id
     ]

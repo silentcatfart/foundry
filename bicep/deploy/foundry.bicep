@@ -75,3 +75,26 @@ module logAnalyticsWorkspaceModule '../modules/loganalyticsws.bicep' = {
   }
 }
 
+// Send the subscription Activity Log to a Log Analytics workspace (required for the KQL alert)
+
+var logAnalyticsWorkspaceId = logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
+
+resource exportActivityLog 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: 'export-activity-logs-to-law'
+  scope: subscription()
+  properties: {
+    workspaceId: logAnalyticsWorkspaceId
+    // Common Activity Log categories
+    logs: [
+      { category: 'Administrative',  enabled: true }
+      { category: 'Security',        enabled: true }
+      { category: 'ServiceHealth',   enabled: true }
+      { category: 'Alert',           enabled: true }
+      { category: 'Recommendation',  enabled: true }
+      { category: 'Policy',          enabled: true }
+      { category: 'Autoscale',       enabled: true }
+      { category: 'ResourceHealth',  enabled: true }
+    ]
+  }
+}
+

@@ -35,7 +35,7 @@ resource rule 'Microsoft.Insights/scheduledQueryRules@2025-01-01-preview' = {
     description: 'Alerts when a VM started > 4h ago and is still running.'
     severity: 3
     enabled: true
-    evaluationFrequency: 'PT30M' // check every 30 minutes
+    evaluationFrequency: 'PT15M' // check every 15 minutes
     windowSize: 'PT4H'           // 4-hour lookback
     overrideQueryTimeRange: 'P2D'   // <= max allowed
     scopes: [

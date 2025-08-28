@@ -3,7 +3,7 @@ param location string
 param tagValues object
 param logAnalSku string = 'PerGB2018'
 
-@description('(Optional) Action Group resource ID to notify.')
+@description('Action Group resource ID to notify.')
 param actionGroupResourceId string
 
 var ruleName = 'vm-running-over-4h'

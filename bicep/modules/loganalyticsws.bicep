@@ -50,7 +50,7 @@ resource rule 'Microsoft.Insights/scheduledQueryRules@2025-01-01-preview' = {
           criterionType: 'StaticThresholdCriterion'
           query: '''
 AzureActivity
-| where TimeGenerated > ago(7d)
+| where TimeGenerated > ago(2d)
 | where ActivityStatusValue in ("Success","Succeeded","Accept","Accepted","Start","Started")
 | where tolower(OperationNameValue) contains "/virtualmachines/start/"
    or tolower(OperationNameValue) contains "/virtualmachines/restart/"

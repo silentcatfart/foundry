@@ -16,6 +16,7 @@ param adminUsername string
 param adminPublicKey string
 param logAnalyticsWorkspaceLocation string
 param logAnalSku string
+param actionGroupResourceId string
 
 resource newRG 'Microsoft.Resources/resourceGroups@2025-04-01' existing = {
   name: resourceGroupName
@@ -72,6 +73,7 @@ module logAnalyticsWorkspaceModule '../modules/loganalyticsws.bicep' = {
     PrefixName : PrefixName 
     tagValues: tagValues
     logAnalSku: logAnalSku
+    actionGroupResourceId: actionGroupResourceId
   }
 }
 

@@ -25,3 +25,4 @@ param adminPublicKey = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDCS5iyFyDcG8hAvYwQ
 
 param logAnalyticsWorkspaceLocation = 'eastus2'
 param logAnalSku = 'PerGB2018'
+param actionGroupResourceId = '/subscriptions/0B755FD2-62D3-4D90-B61C-43FC501C75BF/resourceGroups/azureapp-auto-alerts-46cf52-silentcatfart_gmail_com/providers/microsoft.insights/actionGroups/email'

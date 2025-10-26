@@ -1,0 +1,53 @@
+---
+- hosts: [all]
+  become: false
+  gather_facts: false
+
+  vars_files:
+    - var-secrets.yml
+
+  tasks:
+      - name: Make foundry directories
+        ansible.builtin.shell:
+          chdir: foundrydrive
+          cmd: |
+            mkdir foundry
+            mkdir foundryuserdata
+
+      - name: Download foundry (dev)
+        ansible.builtin.shell:
+          chdir: /home/foundry
+          cmd: |
+            wget --output-document /home/foundry/foundrydrive/foundry/foundryvtt.zip {{ foundry_beta_url }}
+        when: inventory_hostname == 'dev.foundry.silentcatfart.com'    
+
+      - name: Download foundry (tst)
+        ansible.builtin.shell:
+          chdir: /home/foundry
+          cmd: |
+            wget --output-document /home/foundry/foundrydrive/foundry/foundryvtt.zip {{ foundry_url }}
+        when: inventory_hostname == 'tst.foundry.silentcatfart.com'    
+
+      - name: Download foundry (prd)
+        ansible.builtin.shell:
+          chdir: /home/foundry
+          cmd: |
+            wget --output-document /home/foundry/foundrydrive/foundry/foundryvtt.zip {{ foundry_url }}
+        when: inventory_hostname == 'prd.foundry.silentcatfart.com'    
+
+      - name: Unzip foundry
+        ansible.builtin.shell:
+          chdir: /home/foundry
+          cmd: |
+            unzip /home/foundry/foundrydrive/foundry/foundryvtt.zip  -d /home/foundry/foundrydrive/foundry/
+            rm /home/foundry/foundrydrive/foundry/foundryvtt.zip
+
+      - name: Start foundry
+        ansible.builtin.shell:
+          cmd: |
+            pm2 start foundry
+
+      - name: Pause for 120 seconds while foundry service builds out user data path
+        ansible.builtin.pause:
+          seconds: 120
+      

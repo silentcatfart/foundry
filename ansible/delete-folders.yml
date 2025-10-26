@@ -1,0 +1,14 @@
+---
+- hosts: [all]
+  become: true
+  gather_facts: false
+
+  vars_files:
+    - var-secrets.yml
+
+  tasks:
+      - name: Remove Foundry directories
+        ansible.builtin.shell:
+          cmd: |
+           rm -rf /home/foundry/foundrydrive/foundry /home/foundry/foundrydrive/foundryuserdata
+

@@ -1,0 +1,13 @@
+---
+- hosts: [all]
+  become: false
+  gather_facts: false
+
+  vars_files:
+    - var-secrets.yml
+
+  tasks:
+      - name: Stop foundry
+        ansible.builtin.shell:
+          cmd: |
+            pm2 stop foundry

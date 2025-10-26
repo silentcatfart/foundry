@@ -1,0 +1,5 @@
+---
+  - import_playbook: stop-foundry.yml
+  - import_playbook: delete-folders.yml
+  - import_playbook: foundry-upgrade.yml
+  - import_playbook: options.yml

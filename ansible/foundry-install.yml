@@ -42,7 +42,7 @@
             unzip /home/foundry/foundrydrive/foundry/foundryvtt.zip  -d /home/foundry/foundrydrive/foundry/
             rm /home/foundry/foundrydrive/foundry/foundryvtt.zip
 
-      - name: Start foundry
+      - name: Register foundry for pm2 startup
         ansible.builtin.shell:
           chdir: /home/foundry
           cmd: |

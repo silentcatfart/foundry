@@ -26,8 +26,6 @@
              #!/bin/bash
              pm2 stop foundry
              /usr/bin/rclone sync /home/foundry/foundrydrive "azure blob":tst --copy-links --exclude "**/age-shared/**"
-             /usr/bin/rclone sync /home/foundry/foundrydrive/foundryuserdata/Data/modules/silentcatfarts-shared-assets "azure blob":silentcatfarts-shared-assets
-             /usr/bin/rclone sync /home/foundry/foundrydrive/foundryuserdata/Data/age-shared "azure blob":age-shared
              pm2 start foundry
           dest: /home/foundry/backup
           force: no
@@ -57,6 +55,16 @@
           mode: '777'
         when: inventory_hostname == 'dev.foundry.silentcatfart.com'
 
+      - name: Create compendium-content-refresh script (tst)
+        copy:
+          content: |
+             #!/bin/bash
+             #/usr/bin/rclone sync "azure blob":age-shared /home/foundry/foundrydrive/foundryuserdata/Data/age-shared
+          dest: /home/foundry/compendium-content-refresh-one-time
+          force: no
+          mode: '777'
+        when: inventory_hostname == 'tst.foundry.silentcatfart.com'
+
       - name: Create compendium-content-refresh script (prd)
         copy:
           content: |
@@ -72,8 +80,23 @@
         copy:
           content: |
              #!/bin/bash
+
+             # Prompt user with default to N (don't proceed)
+             read -p "Is the local 'age-shared' folder up to date? (y/N): " -n 1 -r
+             echo    # Move to a new line
+
+             # Check if response is explicitly 'y' or 'Y', otherwise exit
+             if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+                 echo "Exiting: Please ensure 'age-shared' folder is present and up to date before running this script."
+                 exit 1
+             fi
+
+             # Proceed with the sync operations
+             echo "Proceeding with sync..."
+             pm2 stop foundry
              /usr/bin/rclone sync /home/foundry/foundrydrive/foundryuserdata/Data/modules/silentcatfarts-shared-assets "azure blob":silentcatfarts-shared-assets
              /usr/bin/rclone sync /home/foundry/foundrydrive/foundryuserdata/Data/age-shared "azure blob":age-shared
+             pm2 start foundry
           dest: /home/foundry/release
           force: no
           mode: '777'

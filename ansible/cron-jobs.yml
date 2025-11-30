@@ -12,7 +12,7 @@
         name: "az-backup"
         minute: "30"
         hour: "1"
-        job: "/home/foundry/rclone-local-to-az"
+        job: "/home/foundry/backup"
         user: foundry
         disabled: true
 
@@ -21,7 +21,7 @@
         name: "az-dowload"
         minute: "00"
         hour: "1"
-        job: "/home/foundry/rclone-az-compendium-to-local"
+        job: "/home/foundry/compendium-content-refresh"
         user: foundry
         disabled: true
       when: inventory_hostname == 'prd.foundry.silentcatfart.com'  
@@ -31,7 +31,7 @@
         name: "az-dowload"
         minute: "00"
         hour: "1"
-        job: "/home/foundry/rclone-az-compendium-to-local"
+        job: "/home/foundry/compendium-content-refresh"
         user: foundry
         disabled: true
       when: inventory_hostname == 'dev.foundry.silentcatfart.com'

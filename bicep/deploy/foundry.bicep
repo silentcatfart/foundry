@@ -10,9 +10,9 @@ param virtualNetworkAddressPrefix string
 param subnetName string
 param subnetAddressPrefix string
 param publicIPLocation string
-param vmSizeDev string = 'Standard_B2ms'
-param vmSizeTst string = 'Standard_B2ms'
-param vmSizePrd string = 'Standard_B8ms'
+param vmSizeDev string 
+param vmSizeTst string 
+param vmSizePrd string
 param dataDiskSizeGB int
 param adminUsername string
 param adminPublicKey string

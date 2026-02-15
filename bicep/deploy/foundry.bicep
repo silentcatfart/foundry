@@ -10,7 +10,9 @@ param virtualNetworkAddressPrefix string
 param subnetName string
 param subnetAddressPrefix string
 param publicIPLocation string
-param vmSize string
+param vmSizeDev string = 'Standard_B2ms'
+param vmSizeTst string = 'Standard_B2ms'
+param vmSizePrd string = 'Standard_B8ms'
 param dataDiskSizeGB int
 param adminUsername string
 param adminPublicKey string
@@ -56,9 +58,11 @@ module linuxVmModule '../modules/linuxvm.bicep' = {
     pipModuleTstId: publicIPModule.outputs.publicIPAddresststId
     pipModulePrdId: publicIPModule.outputs.publicIPAddressprdId
     vnetModuleSubId: virtualNetworkModule.outputs.subnetId
-    PrefixName : PrefixName 
+    PrefixName : PrefixName
     tagValues: tagValues
-    vmSize: vmSize
+    vmSizeDev: vmSizeDev
+    vmSizeTst: vmSizeTst
+    vmSizePrd: vmSizePrd
     dataDiskSizeGB: dataDiskSizeGB
     adminUsername: adminUsername
     adminPublicKey: adminPublicKey

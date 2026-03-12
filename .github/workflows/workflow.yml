@@ -19,10 +19,8 @@ env:
 
 jobs:
   what-if:
-    name: Bicep What-If Analysis
+    name: Bicep What-If
     runs-on: ubuntu-latest
-    environment:
-      name: prod
     steps:
     - uses: actions/checkout@v3
     - uses: azure/login@v1
@@ -45,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: what-if
     environment:
-      name: prod
+      name: prod ## approval gate to review what-if results before deploying
     steps:
     - uses: actions/checkout@v3
     - uses: azure/login@v1

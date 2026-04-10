@@ -23,7 +23,7 @@ jobs:
     name: Bicep What-If
     runs-on: ubuntu-latest
     environment:
-      name: prod ## approval gate to review what-if results before deploying
+      name: what-if
     steps:
     - uses: actions/checkout@v4
     - uses: azure/login@v2

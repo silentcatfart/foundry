@@ -16,6 +16,7 @@ permissions:
 
 env:
   AZURE_LOCATION: eastus2
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true ## Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026
 
 jobs:
   what-if:

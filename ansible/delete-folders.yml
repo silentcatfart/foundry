@@ -7,8 +7,13 @@
     - var-secrets.yml
 
   tasks:
-      - name: Remove Foundry directories
+      - name: Remove Foundry Installation directories
         ansible.builtin.shell:
           cmd: |
-           rm -rf /home/foundry/foundrydrive/foundry /home/foundry/foundrydrive/foundryuserdata
+           rm -rf /home/foundry/foundrydrive/foundry
 
+# Uncomment this if you want to remove the userdata directories as well. This will cause you to lose all of your world data, so be sure to back it up first if you want to keep it.
+#      - name: Remove Foundry Userdata directories
+#        ansible.builtin.shell:
+#          cmd: |
+#           rm -rf /home/foundry/foundrydrive/foundryuserdata

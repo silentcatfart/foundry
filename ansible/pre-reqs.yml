@@ -24,13 +24,13 @@
             chmod o+r /usr/share/keyrings/caddy-stable-archive-keyring.gpg
             chmod o+r /etc/apt/sources.list.d/caddy-stable.list
 
-      - name: Prep node 22 repo
+      - name: Prep node 24 repo
         ansible.builtin.shell:
           cmd: |
             sudo apt install -y ca-certificates curl gnupg
             sudo mkdir -p /etc/apt/keyrings
             curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-            NODE_MAJOR=22
+            NODE_MAJOR=24
             echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
 
 
@@ -44,4 +44,10 @@
           - libnss3-tools
           - caddy
           - unzip
+          state: present
+
+      - name: Upgrade nodejs
+        ansible.builtin.apt:
+          pkg:
           - nodejs  # installs npm as well
+          state: latest

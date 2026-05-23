@@ -1,6 +1,7 @@
 ## Don't forget to sync 'age-shared' from blob storage to the local machine after upgrade
 ---
   - import_playbook: stop-foundry.yml
+  - import_playbook: pre-reqs.yml
   - import_playbook: delete-folders.yml
   - import_playbook: foundry-upgrade.yml
   - import_playbook: options.yml

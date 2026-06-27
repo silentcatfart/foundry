@@ -11,8 +11,8 @@
         ansible.builtin.shell:
           chdir: foundrydrive
           cmd: |
-            mkdir foundry
-            mkdir foundryuserdata
+            mkdir -p foundry
+            mkdir -p foundryuserdata
 
       - name: Download foundry (dev)
         ansible.builtin.shell:

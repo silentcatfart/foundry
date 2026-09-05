@@ -1,0 +1,26 @@
+---
+- hosts: [dev.foundry.silentcatfart.com, tst.foundry.silentcatfart.com, prd.foundry.silentcatfart.com]
+  become: true
+  gather_facts: false
+
+  vars_files:
+    - var-secrets.yml
+
+  tasks:
+      - name: Compare local artifacts folder against azure blob artifacts container
+        ansible.builtin.command:
+          cmd: /usr/bin/rclone check "azure blob":artifacts /home/foundry/foundrydrive/foundryuserdata/Data/artifacts
+        environment:
+          RCLONE_CONFIG: /home/foundry/.config/rclone/rclone.conf
+        register: rclone_check_result
+        changed_when: false
+        failed_when: false
+
+      - name: Report sync status
+        debug:
+          msg: "{{ inventory_hostname }}: {{ 'IN SYNC' if rclone_check_result.rc == 0 else 'OUT OF SYNC (rc=' + rclone_check_result.rc | string + ')' }}"
+
+      - name: Show differences when out of sync
+        debug:
+          var: rclone_check_result.stderr_lines
+        when: rclone_check_result.rc != 0

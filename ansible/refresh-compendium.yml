@@ -18,13 +18,13 @@
             [Service]
             User=root
             Environment=RCLONE_CONFIG=/home/foundry/.config/rclone/rclone.conf
-            ExecStart=/usr/bin/rclone sync "azure blob":age-shared /home/foundry/foundrydrive/foundryuserdata/Data/age-shared \
+            ExecStart=/usr/bin/rclone sync "azure blob":artifacts /home/foundry/foundrydrive/foundryuserdata/Data/artifacts \
               --log-file /var/log/rclone-az.log --log-level DEBUG
 
             [Install]
             WantedBy=default.target
           dest: /etc/systemd/system/rclone-az-compendium-to-local.service
-          force: no
+          force: yes
 
       - name: Enable service
         ansible.builtin.shell:
@@ -32,3 +32,4 @@
             sudo chmod 664 /etc/systemd/system/rclone-az-compendium-to-local.service
             sudo systemctl daemon-reload
             sudo systemctl enable rclone-az-compendium-to-local.service
+            sudo systemctl restart rclone-az-compendium-to-local.service

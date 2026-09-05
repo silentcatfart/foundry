@@ -13,10 +13,10 @@
           content: |
              #!/bin/bash
              pm2 stop foundry
-             /usr/bin/rclone sync /home/foundry/foundrydrive "azure blob":dev --copy-links --exclude "**/age-shared/**"
+             /usr/bin/rclone sync /home/foundry/foundrydrive "azure blob":dev --copy-links --exclude "**/age-shared/**"  "**/artifacts/**"
              pm2 start foundry
           dest: /home/foundry/backup
-          force: no
+          force: yes
           mode: '777'
         when: inventory_hostname == 'dev.foundry.silentcatfart.com'  
 
@@ -25,10 +25,10 @@
           content: |
              #!/bin/bash
              pm2 stop foundry
-             /usr/bin/rclone sync /home/foundry/foundrydrive "azure blob":tst --copy-links --exclude "**/age-shared/**"
+             /usr/bin/rclone sync /home/foundry/foundrydrive "azure blob":tst --copy-links --exclude "**/age-shared/**" "**/artifacts/**"
              pm2 start foundry
           dest: /home/foundry/backup
-          force: no
+          force: yes
           mode: '777'
         when: inventory_hostname == 'tst.foundry.silentcatfart.com' 
 
@@ -37,10 +37,10 @@
           content: |
              #!/bin/bash
              pm2 stop foundry
-             /usr/bin/rclone sync /home/foundry/foundrydrive "azure blob":prd --copy-links --exclude "**/age-shared/**"
+             /usr/bin/rclone sync /home/foundry/foundrydrive "azure blob":prd --copy-links --exclude "**/age-shared/**" "**/artifacts/**"
              pm2 start foundry
           dest: /home/foundry/backup
-          force: no
+          force: yes
           mode: '777'
         when: inventory_hostname == 'prd.foundry.silentcatfart.com' 
 
@@ -49,9 +49,9 @@
         copy:
           content: |
              #!/bin/bash
-             /usr/bin/rclone sync "azure blob":age-shared /home/foundry/foundrydrive/foundryuserdata/Data/age-shared
+             /usr/bin/rclone sync "azure blob":artifacts /home/foundry/foundrydrive/foundryuserdata/Data/artifacts
           dest: /home/foundry/compendium-content-refresh
-          force: no
+          force: yes
           mode: '777'
         when: inventory_hostname == 'dev.foundry.silentcatfart.com'
 
@@ -59,9 +59,9 @@
         copy:
           content: |
              #!/bin/bash
-             #/usr/bin/rclone sync "azure blob":age-shared /home/foundry/foundrydrive/foundryuserdata/Data/age-shared
+             #/usr/bin/rclone sync "azure blob":artifacts /home/foundry/foundrydrive/foundryuserdata/Data/artifacts             
           dest: /home/foundry/compendium-content-refresh-one-time
-          force: no
+          force: yes
           mode: '777'
         when: inventory_hostname == 'tst.foundry.silentcatfart.com'
 
@@ -69,9 +69,9 @@
         copy:
           content: |
              #!/bin/bash
-             /usr/bin/rclone sync "azure blob":age-shared /home/foundry/foundrydrive/foundryuserdata/Data/age-shared
+             /usr/bin/rclone sync "azure blob":artifacts /home/foundry/foundrydrive/foundryuserdata/Data/artifacts
           dest: /home/foundry/compendium-content-refresh
-          force: no
+          force: yes
           mode: '777'
         when: inventory_hostname == 'prd.foundry.silentcatfart.com'        
 
@@ -82,12 +82,12 @@
              #!/bin/bash
 
              # Prompt user with default to N (don't proceed)
-             read -p "Is the local 'age-shared' folder up to date? (y/N): " -n 1 -r
+             read -p "Is the local 'artifacts' folder up to date? (y/N): " -n 1 -r
              echo    # Move to a new line
 
              # Check if response is explicitly 'y' or 'Y', otherwise exit
              if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-                 echo "Exiting: Please ensure 'age-shared' folder is present and up to date before running this script."
+                 echo "Exiting: Please ensure 'artifacts' folder is present and up to date before running this script."
                  exit 1
              fi
 
@@ -95,9 +95,9 @@
              echo "Proceeding with sync..."
              pm2 stop foundry
              /usr/bin/rclone sync /home/foundry/foundrydrive/foundryuserdata/Data/modules/silentcatfarts-shared-assets "azure blob":silentcatfarts-shared-assets
-             /usr/bin/rclone sync /home/foundry/foundrydrive/foundryuserdata/Data/age-shared "azure blob":age-shared
+             /usr/bin/rclone sync /home/foundry/foundrydrive/foundryuserdata/Data/artifacts "azure blob":artifacts
              pm2 start foundry
           dest: /home/foundry/release
-          force: no
+          force: yes
           mode: '777'
         when: inventory_hostname == 'tst.foundry.silentcatfart.com'

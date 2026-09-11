@@ -4,8 +4,8 @@ param PrefixName string = 'fndry'
 param virtualNetworkLocation string
 param tagValues object 
 
-@description('My public IPv4 address')
-param myPublicIPv4 string = '69.249.125.110/32'
+@description('My public IPv4 address(es)')
+param myPublicIPv4 array
 
 //@description('Cloudflare CIDR IPs')
 //param cloudflareCIDR array = ['173.245.48.0/20'
@@ -83,7 +83,7 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2024-07-01' = {
           protocol: 'Tcp'
           sourcePortRange: '*'
           destinationPortRange: '22'
-          sourceAddressPrefix: myPublicIPv4
+          sourceAddressPrefixes: myPublicIPv4
           destinationAddressPrefix: subnetAddressPrefix
           access: 'Allow'
           priority: 160

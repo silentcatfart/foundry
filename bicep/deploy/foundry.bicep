@@ -4,7 +4,7 @@ param resourceGroupName string
 param tagValues object
 param PrefixName string
 param virtualNetworkLocation string
-param myPublicIPv4 string
+param myPublicIPv4 array
 param virtualNetworkName string
 param virtualNetworkAddressPrefix string
 param subnetName string

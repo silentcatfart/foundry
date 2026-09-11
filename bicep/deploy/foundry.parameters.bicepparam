@@ -10,7 +10,7 @@ param tagValues = {
 
 param PrefixName = 'fndry'
 param virtualNetworkLocation = 'eastus2'
-param myPublicIPv4 = '69.249.125.110/32'
+param myPublicIPv4 = '69.249.125.110/32,8.20.69.6/32'
 param virtualNetworkName  = '${PrefixName}-vnet'
 param virtualNetworkAddressPrefix = '10.250.0.0/24'
 param subnetName = '${PrefixName}-subnet'

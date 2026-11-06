@@ -16,10 +16,10 @@
             After=network.target
 
             [Service]
-            User=root
+            User=foundry
             Environment=RCLONE_CONFIG=/home/foundry/.config/rclone/rclone.conf
             ExecStart=/usr/bin/rclone sync "azure blob":artifacts /home/foundry/foundrydrive/foundryuserdata/Data/artifacts \
-              --log-file /var/log/rclone-az.log --log-level DEBUG
+              --log-file /home/foundry/rclone-az.log --log-level DEBUG
 
             [Install]
             WantedBy=default.target

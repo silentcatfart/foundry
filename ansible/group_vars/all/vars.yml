@@ -25,4 +25,4 @@ compendium_pull: "{{ foundry_env != 'tst' }}"
 
 # rclone auth: "key" (storage account key from the vault) or "msi" (VM managed identity).
 # msi needs the Bicep role assignments (assignStorageRoles) and the official rclone build.
-rclone_auth: key
+rclone_auth: msi

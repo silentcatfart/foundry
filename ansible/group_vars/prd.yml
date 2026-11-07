@@ -1,0 +1,4 @@
+---
+# Running games
+foundry_env: prd
+foundry_download_url: "{{ foundry_url }}"

@@ -1,13 +1,10 @@
 ---
-- hosts: [all]
+- name: Start Foundry
+  hosts: all
   become: false
   gather_facts: false
 
-  vars_files:
-    - var-secrets.yml
-
   tasks:
-      - name: Start foundry
-        ansible.builtin.shell:
-          cmd: |
-            pm2 start foundry
+    - name: Start foundry
+      ansible.builtin.command:
+        cmd: pm2 start foundry

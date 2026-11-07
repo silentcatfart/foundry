@@ -1,7 +1,7 @@
-param PrefixName string = 'fndry'
+param PrefixName string
 param location string
 param tagValues object
-param logAnalSku string = 'PerGB2018'
+param logAnalSku string
 
 @description('Action Group resource ID to notify.')
 param actionGroupResourceId string

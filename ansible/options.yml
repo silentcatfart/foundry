@@ -1,51 +1,35 @@
 ---
-- hosts: [all]
+- name: Configure Foundry options.json for the Caddy proxy
+  hosts: all
   become: false
   gather_facts: false
 
-  vars_files:
-    - var-secrets.yml
+  vars:
+    options_file: "{{ foundry_data_dir }}/Config/options.json"
 
   tasks:
-      - name: Stop foundry
-        ansible.builtin.shell:
-          cmd: |
-            pm2 stop foundry
+    - name: Stop foundry
+      ansible.builtin.command:
+        cmd: pm2 stop foundry
 
-      - name: Update options.json proxy port
-        replace:
-          path: /home/foundry/foundrydrive/foundryuserdata/Config/options.json
-          regexp: '"proxyPort": null,'
-          replace: '"proxyPort": 443,'
+    - name: Update options.json proxy port
+      ansible.builtin.replace:
+        path: "{{ options_file }}"
+        regexp: '"proxyPort": null,'
+        replace: '"proxyPort": 443,'
 
-      - name: Update options.json SSL enable
-        replace:
-          path: /home/foundry/foundrydrive/foundryuserdata/Config/options.json
-          regexp: '"proxySSL": false,'
-          replace: '"proxySSL": true,'
+    - name: Update options.json SSL enable
+      ansible.builtin.replace:
+        path: "{{ options_file }}"
+        regexp: '"proxySSL": false,'
+        replace: '"proxySSL": true,'
 
-      - name: Update options.json hostname (dev)
-        replace:
-          path: /home/foundry/foundrydrive/foundryuserdata/Config/options.json
-          regexp: '"hostname": null,'
-          replace: '"hostname": "dev.foundry.silentcatfart.com",'
-        when: inventory_hostname == 'dev.foundry.silentcatfart.com'
+    - name: Update options.json hostname
+      ansible.builtin.replace:
+        path: "{{ options_file }}"
+        regexp: '"hostname": null,'
+        replace: '"hostname": "{{ inventory_hostname }}",'
 
-      - name: Update options.json hostname (tst)
-        replace:
-          path: /home/foundry/foundrydrive/foundryuserdata/Config/options.json
-          regexp: '"hostname": null,'
-          replace: '"hostname": "tst.foundry.silentcatfart.com",'
-        when: inventory_hostname == 'tst.foundry.silentcatfart.com'
-
-      - name: Update options.json hostname (prd)
-        replace:
-          path: /home/foundry/foundrydrive/foundryuserdata/Config/options.json
-          regexp: '"hostname": null,'
-          replace: '"hostname": "prd.foundry.silentcatfart.com",'
-        when: inventory_hostname == 'prd.foundry.silentcatfart.com'                      
-
-      - name: Start foundry
-        ansible.builtin.shell:
-          cmd: |
-            pm2 start foundry
+    - name: Start foundry
+      ansible.builtin.command:
+        cmd: pm2 start foundry

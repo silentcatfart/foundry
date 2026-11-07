@@ -1,18 +1,16 @@
-## foundry ALL=(ALL) NOPASSWD:ALL in /etc/sudoers.d/ folder
 ---
-- hosts: [all]
+# foundry ALL=(ALL) NOPASSWD:ALL in /etc/sudoers.d/
+- name: Passwordless sudo for the foundry user
+  hosts: all
   become: true
   gather_facts: false
-
-  vars_files:
-    - var-secrets.yml
 
   tasks:
     - name: Allow foundry user to run all commands without password
       community.general.sudoers:
         name: foundry-all
         state: present
-        user: foundry
+        user: "{{ foundry_user }}"
         runas: ALL
         commands: ALL
         nopassword: true

@@ -1,29 +1,36 @@
 ---
-- hosts: [all]
+- name: rclone with the Azure blob remote
+  hosts: all
   become: true
   gather_facts: false
 
-  vars_files:
-    - var-secrets.yml
-
   tasks:
-      - name: Install rclone
-        ansible.builtin.apt:
-          pkg:
+    # Ubuntu 22.04's rclone (1.53) predates managed identity support, so msi uses the official build.
+    - name: Install rclone (Ubuntu package)
+      ansible.builtin.apt:
+        pkg:
           - rclone
+      when: rclone_auth == 'key'
 
-      - name: Create config directory
-        ansible.builtin.file:
-          path: /home/foundry/.config/rclone
-          state: directory
-          mode: '775'
+    - name: Install rclone (official build, needed for managed identity)
+      ansible.builtin.apt:
+        deb: https://downloads.rclone.org/rclone-current-linux-amd64.deb
+      when: rclone_auth == 'msi'
 
-      - name: Copy rclone config to server
-        copy:
-          content: |
-            [azure blob]
-            type = azureblob
-            account = fndryst
-            key = {{ blob_sas_key }}
-          dest: /home/foundry/.config/rclone/rclone.conf
-          force: no
+    - name: Create config directory
+      ansible.builtin.file:
+        path: "{{ rclone_config | dirname }}"
+        state: directory
+        owner: "{{ foundry_user }}"
+        group: "{{ foundry_user }}"
+        mode: "0700"
+
+    - name: Copy rclone config to server
+      ansible.builtin.template:
+        src: rclone.conf.j2
+        dest: "{{ rclone_config }}"
+        owner: "{{ foundry_user }}"
+        group: "{{ foundry_user }}"
+        mode: "0600"
+        force: "{{ rclone_auth == 'msi' }}"   # key configs are left alone once written
+      no_log: true

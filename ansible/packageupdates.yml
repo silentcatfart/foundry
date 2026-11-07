@@ -1,26 +1,20 @@
 ---
-  - hosts: [all]
-    become: true
-    gather_facts: false
+- name: Patch servers
+  hosts: all
+  become: true
+  gather_facts: false
 
-    vars_files:
-      - var-secrets.yml
+  tasks:
+    - name: Upgrade all apt packages (including new kernels)
+      ansible.builtin.apt:
+        update_cache: true
+        upgrade: dist
 
-    tasks:
-      - name: Update package cache
-        ansible.builtin.apt:
-          update_cache=yes
+    - name: Check if reboot is required
+      ansible.builtin.stat:
+        path: /var/run/reboot-required
+      register: reboot_required
 
-      - name: Upgrade all apt packages
-        ansible.builtin.apt:
-          name=*
-          state=latest
-
-      - name: Check if reboot is required
-        stat:
-          path: /var/run/reboot-required
-        register: reboot_required
-
-      - name: Reboot server
-        reboot:
-        when: reboot_required.stat.exists == true
+    - name: Reboot server
+      ansible.builtin.reboot:
+      when: reboot_required.stat.exists

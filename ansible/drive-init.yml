@@ -1,45 +1,35 @@
 ---
-- hosts: [all]
+- name: Partition, format and mount the data disk
+  hosts: all
   become: true
   gather_facts: false
 
-  vars_files:
-    - var-secrets.yml
-    - var-device.yml
-
   tasks:
-      - name: Create a new xfs primary partition
-        community.general.parted:
-          device: /dev/sdc
-          number: 1
-          label: gpt
-          name: xfspart
-          state: present
-          fs_type: xfs
-          part_start: "0%"
-          part_end: "100%"
+    - name: Create an xfs primary partition on the data disk (LUN 0)
+      community.general.parted:
+        device: "{{ data_disk_device }}"
+        number: 1
+        label: gpt
+        name: xfspart
+        state: present
+        fs_type: xfs
+        part_start: "0%"
+        part_end: "100%"
 
-      - name: Create a xfs filesystem on /dev/sdc1
-        community.general.filesystem:
-          fstype: xfs
-          dev: /dev/sdc1
+    - name: Create an xfs filesystem on the data disk partition
+      community.general.filesystem:
+        fstype: xfs
+        dev: "{{ data_disk_partition }}"
 
-      - name: Inform the OS about the partition table change
-        ansible.builtin.shell: "sudo partprobe /dev/sdc1"
+    - name: Get partition UUID
+      ansible.builtin.command: lsblk -no UUID {{ data_disk_partition }}
+      register: data_disk_uuid
+      changed_when: false
 
-      - name: Make the /datadrive directory
-        ansible.builtin.shell: "sudo mkdir /datadrive"
-
-      - name: Get UUID
-        ansible.builtin.command: lsblk {{ item.device }} -no UUID
-        loop: "{{ devices }}"
-        register: uuid
-
-      - name: Mount volume and create fstab entry
-        ansible.posix.mount:
-          path: "{{ item.item.mount }}"
-          src: UUID={{ item.stdout_lines[0] }}
-          state: mounted
-          fstype: xfs
-          opts: defaults,nofail
-        loop: "{{ uuid.results }}"
+    - name: Mount volume and create fstab entry
+      ansible.posix.mount:
+        path: "{{ data_disk_mount }}"
+        src: "UUID={{ data_disk_uuid.stdout_lines[0] }}"
+        state: mounted
+        fstype: xfs
+        opts: defaults,nofail

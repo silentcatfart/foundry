@@ -1,0 +1,19 @@
+#!/bin/bash
+# {{ ansible_managed }}
+# ONE-TIME manual pull of compendium content from blob storage, for a freshly built tst server only.
+# After that, tst is the source of truth and only pushes (~/release).
+
+if [ -n "$(ls -A {{ foundry_artifacts_dir }} 2>/dev/null)" ]; then
+    echo "Refusing to run: {{ foundry_artifacts_dir }} is not empty."
+    echo "This would overwrite local compendium work with what is in blob storage."
+    exit 1
+fi
+
+read -p "Pull artifacts from blob storage into an EMPTY local folder? (y/N): " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Exiting."
+    exit 1
+fi
+
+/usr/bin/rclone sync "{{ rclone_remote }}":artifacts {{ foundry_artifacts_dir }}

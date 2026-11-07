@@ -1,0 +1,4 @@
+---
+# Building compendiums (source of truth for artifacts, publishes via ~/release)
+foundry_env: tst
+foundry_download_url: "{{ foundry_url }}"

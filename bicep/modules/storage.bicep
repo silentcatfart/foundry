@@ -1,21 +1,25 @@
-param storageLocation string
-param storageName string
-param tagValues object 
-param storageKind string = 'Storage'
-param storageSku string = 'Standard_LRS'
+// Existing storage account used by rclone (backups, artifacts, shared-assets module).
+// Settings match what was originally created; only public blob access is turned off.
 
-resource storageAcct 'Microsoft.Storage/storageAccounts@2024-01-01' = {
-  name: storageName
-  location: storageLocation 
+param storageAccountName string
+param location string
+param tagValues object
+
+resource storage 'Microsoft.Storage/storageAccounts@2024-01-01' = {
+  name: storageAccountName
+  location: location
   tags: tagValues
-  kind: storageKind
+  kind: 'StorageV2'
   sku: {
-    name: storageSku
+    name: 'Standard_GRS'
   }
-  properties: {}
+  properties: {
+    accessTier: 'Hot'
+    minimumTlsVersion: 'TLS1_2'
+    supportsHttpsTrafficOnly: true
+    allowBlobPublicAccess: false // all containers are private; nothing is served anonymously
+    allowSharedKeyAccess: true // the account key is still used for local rclone pulls
+  }
 }
 
-  // Outputs
-  output storageAcctId string = storageAcct.id
-  output storageAcctName string = storageAcct.name
-  output storageAcctPrimaryLocation string = storageAcct.location
+output name string = storage.name

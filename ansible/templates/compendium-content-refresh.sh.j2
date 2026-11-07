@@ -1,0 +1,4 @@
+#!/bin/bash
+# {{ ansible_managed }}
+# Download compendium content from blob storage to the local drive
+/usr/bin/rclone sync "{{ rclone_remote }}":artifacts {{ foundry_artifacts_dir }}

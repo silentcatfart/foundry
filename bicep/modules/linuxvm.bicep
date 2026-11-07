@@ -1,33 +1,65 @@
-param PrefixName string = 'fndry'
+// One Foundry environment: public IP, NIC and VM with a data disk.
+// Deployed once per entry in the `environments` param of foundry.bicep.
+
+@description('Prefix for all resource names.')
+param PrefixName string
+
+@description('Environment short name, e.g. dev, tst, prd. Used in resource names.')
+param envName string
+
 param location string
 param tagValues object
-param vmSizeDev string = 'Standard_B1ms'
-param vmSizeTst string = 'Standard_B1ms'
-param vmSizePrd string = 'Standard_B1ms'
-param dataDiskSizeGB int = 64
-param adminUsername string = 'foundry'
-param adminPublicKey string = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDCS5iyFyDcG8hAvYwQjEzijmGeJibEEuZ57WfZ0QzivUScWbF0vYtglpiXv9cxlclDGc6J2ehWdOvsg/beR89iN2dUHxQsoBDhkwBeSeuUa8NQCMsm3BdxqNW+R/PQzahGzcOQ0UNsdlj+U57AFnGStaogErR5o5rjhNEF9j4bpugGHIkMQY7SnEVpAPHypmvAb9WMU4uGnO0LqH5kZy3dA2XLsGCtfhlzst7p0MXNkoZqaWMwoXSVvaJjYFqNzfJW2WVkpbSdpa1mfNI/g0R7PT4Pm59HiF7y5Ex7HWczLkqp54LZwMaWR4Km7Brz0V4hidSBXm+eAPSgx0/CX1BmYfGfJ2yifd2EtdIVORY5btNAdstUtD1B6L0SH80hLuvFr9dYHsWFVLkOaeYypr/k0RWOiSFVip4DrKT2nGew194/jD/YIm/GuN97+qukxF7UVpqlJvfEW1wzTl7WwAceuJ90vi7gSvRRdwaSkVjxDLgGhnqSHcnIguTTcLGyuiNKGyW2nibTnTZqCYThYuOpHJ/3nBpPYuO9rjI8nayz7E7BBl3XxBrjzwiuffcMrY0Hwzatsm4W9ALl6lvRyzFOOW7lvc18UJjQ9c7BI5bCO4CGtFAjs0fejdfR9udDkSn1cbhMBi+8kMnPg4b4RKV6bl6P//MlBUhakIA7yUVaZw== aengleman@ASENj893Q13'
-param pipModuleDevId string
-param pipModuleTstId string
-param pipModulePrdId string
-param vnetModuleSubId string
 
-// Network Interfaces
-resource networkInterfacedev 'Microsoft.Network/networkInterfaces@2024-07-01' = {
-  name: '${PrefixName}-dev-vm-nic'
+param vmSize string
+
+@description('Availability zone for the VM.')
+param zone string
+
+param subnetId string
+param dataDiskSizeGB int
+param adminUsername string
+param adminPublicKey string
+
+@description('Managed disk SKU for the OS and data disks. Changing it requires the VM to be deallocated.')
+param diskSku string
+
+@description('Daily auto-shutdown time (HHmm) in shutdownTimeZone.')
+param shutdownTime string
+param shutdownTimeZone string
+
+@description('Email for the 30-minute auto-shutdown warning. Empty disables the notification.')
+param shutdownNotificationEmail string
+
+var baseName = '${PrefixName}-${envName}-vm'
+
+resource publicIP 'Microsoft.Network/publicIPAddresses@2024-07-01' = {
+  name: '${baseName}-pip'
+  location: location
+  tags: tagValues
+  sku: {
+    name: 'Standard'
+  }
+  properties: {
+    publicIPAllocationMethod: 'Static'
+    publicIPAddressVersion: 'IPv4'
+  }
+}
+
+resource nic 'Microsoft.Network/networkInterfaces@2024-07-01' = {
+  name: '${baseName}-nic'
   location: location
   tags: tagValues
   properties: {
     ipConfigurations: [
       {
-        name: '${PrefixName}-dev-ipconfig'
+        name: '${PrefixName}-${envName}-ipconfig'
         properties: {
           privateIPAllocationMethod: 'Dynamic'
           subnet: {
-            id: vnetModuleSubId
+            id: subnetId
           }
           publicIPAddress: {
-            id: pipModuleDevId
+            id: publicIP.id
           }
         }
       }
@@ -35,61 +67,19 @@ resource networkInterfacedev 'Microsoft.Network/networkInterfaces@2024-07-01' = 
   }
 }
 
-resource networkInterfacetst 'Microsoft.Network/networkInterfaces@2024-07-01' = {
-  name: '${PrefixName}-tst-vm-nic'
+resource vm 'Microsoft.Compute/virtualMachines@2024-07-01' = {
+  name: baseName
   location: location
   tags: tagValues
-  properties: {
-    ipConfigurations: [
-      {
-        name: '${PrefixName}-tst-ipconfig'
-        properties: {
-          privateIPAllocationMethod: 'Dynamic'
-          subnet: {
-            id: vnetModuleSubId
-          }
-          publicIPAddress: {
-            id: pipModuleTstId
-          }
-        }
-      }
-    ]
+  identity: {
+    type: 'SystemAssigned' // used by rclone to reach blob storage without a key
   }
-}
-
-resource networkInterfaceprd 'Microsoft.Network/networkInterfaces@2024-07-01' = {
-  name: '${PrefixName}-prd-vm-nic'
-  location: location
-  tags: tagValues
-  properties: {
-    ipConfigurations: [
-      {
-        name: '${PrefixName}-prd-ipconfig'
-        properties: {
-          privateIPAllocationMethod: 'Dynamic'
-          subnet: {
-            id: vnetModuleSubId
-          }
-          publicIPAddress: {
-            id: pipModulePrdId
-          }
-        }
-      }
-    ]
-  }
-}
-
-// development VM
-resource virtualMachinedev 'Microsoft.Compute/virtualMachines@2024-07-01' = {
-  name: '${PrefixName}-dev-vm'
-  location: location
-  tags: tagValues
-  zones:  [
-    '1'
+  zones: [
+    zone
   ]
   properties: {
     hardwareProfile: {
-      vmSize: vmSizeDev
+      vmSize: vmSize
     }
     storageProfile: {
       imageReference: {
@@ -99,176 +89,71 @@ resource virtualMachinedev 'Microsoft.Compute/virtualMachines@2024-07-01' = {
         version: 'latest'
       }
       osDisk: {
-        name: '${PrefixName}-dev-vm-osdisk'
+        name: '${baseName}-osdisk'
         caching: 'ReadWrite'
         createOption: 'FromImage'
         managedDisk: {
-          storageAccountType: 'Standard_LRS'
+          storageAccountType: diskSku
         }
       }
-        dataDisks: [
-          {
-            name: '${PrefixName}-dev-vm-datadisk'
-            lun: 0
-            diskSizeGB: dataDiskSizeGB
-            createOption: 'Empty'
-            managedDisk: {
-              storageAccountType: 'Standard_LRS'
+      dataDisks: [
+        {
+          name: '${baseName}-datadisk'
+          lun: 0
+          diskSizeGB: dataDiskSizeGB
+          createOption: 'Empty'
+          managedDisk: {
+            storageAccountType: diskSku
+          }
+        }
+      ]
+    }
+    networkProfile: {
+      networkInterfaces: [
+        {
+          id: nic.id
+        }
+      ]
+    }
+    osProfile: {
+      computerName: baseName
+      adminUsername: adminUsername
+      linuxConfiguration: {
+        disablePasswordAuthentication: true
+        ssh: {
+          publicKeys: [
+            {
+              path: '/home/${adminUsername}/.ssh/authorized_keys'
+              keyData: adminPublicKey
             }
-          }
-        ]
-      }
-      networkProfile: {
-        networkInterfaces: [
-          {
-            id: networkInterfacedev.id
-          }
-        ]
-      }
-      osProfile: {
-        computerName: '${PrefixName}-dev-vm'
-        adminUsername: adminUsername
-        linuxConfiguration: {
-          disablePasswordAuthentication: true
-          ssh: {
-            publicKeys: [
-              {
-                path: '/home/${adminUsername}/.ssh/authorized_keys'
-                keyData: adminPublicKey
-              }
-            ]
-          }
+          ]
         }
       }
     }
   }
- 
-// test VM
+}
 
-resource virtualMachinetst 'Microsoft.Compute/virtualMachines@2024-07-01' = {
-  name: '${PrefixName}-tst-vm'
+// Name and settings match the schedules originally created in the portal
+resource autoShutdown 'Microsoft.DevTestLab/schedules@2018-09-15' = {
+  name: 'shutdown-computevm-${vm.name}'
   location: location
-  tags: tagValues
-  zones:  [
-    '2'
-  ]
   properties: {
-    hardwareProfile: {
-      vmSize: vmSizeTst
+    status: 'Enabled'
+    taskType: 'ComputeVmShutdownTask'
+    dailyRecurrence: {
+      time: shutdownTime
     }
-    storageProfile: {
-      imageReference: {
-        publisher: 'Canonical'
-        offer: '0001-com-ubuntu-server-jammy'
-        sku: '22_04-lts-gen2'
-        version: 'latest'
-      }
-      osDisk: {
-        name: '${PrefixName}-tst-vm-osdisk'
-        caching: 'ReadWrite'
-        createOption: 'FromImage'
-        managedDisk: {
-          storageAccountType: 'Standard_LRS'
-        }
-      }
-        dataDisks: [
-          {
-            name: '${PrefixName}-tst-vm-datadisk'
-            lun: 0
-            diskSizeGB: dataDiskSizeGB
-            createOption: 'Empty'
-            managedDisk: {
-              storageAccountType: 'Standard_LRS'
-            }
-          }
-        ]
-      }
-      networkProfile: {
-        networkInterfaces: [
-          {
-            id: networkInterfacetst.id
-          }
-        ]
-      }
-      osProfile: {
-        computerName: '${PrefixName}-tst-vm'
-        adminUsername: adminUsername
-        linuxConfiguration: {
-          disablePasswordAuthentication: true
-          ssh: {
-            publicKeys: [
-              {
-                path: '/home/${adminUsername}/.ssh/authorized_keys'
-                keyData: adminPublicKey
-              }
-            ]
-          }
-        }
-      }
+    timeZoneId: shutdownTimeZone
+    targetResourceId: vm.id
+    notificationSettings: {
+      status: empty(shutdownNotificationEmail) ? 'Disabled' : 'Enabled'
+      emailRecipient: shutdownNotificationEmail
+      notificationLocale: 'en'
+      timeInMinutes: 30
     }
   }
+}
 
-// production VM
-
-resource virtualMachineprd 'Microsoft.Compute/virtualMachines@2024-07-01' = {
-  name: '${PrefixName}-prd-vm'
-  location: location
-  tags: tagValues
-  zones:  [
-    '3'
-  ]
-  properties: {
-    hardwareProfile: {
-      vmSize: vmSizePrd
-    }
-    storageProfile: {
-      imageReference: {
-        publisher: 'Canonical'
-        offer: '0001-com-ubuntu-server-jammy'
-        sku: '22_04-lts-gen2'
-        version: 'latest'
-      }
-      osDisk: {
-        name: '${PrefixName}-prd-vm-osdisk'
-        caching: 'ReadWrite'
-        createOption: 'FromImage'
-        managedDisk: {
-          storageAccountType: 'Standard_LRS'
-        }
-      }
-        dataDisks: [
-          {
-            name: '${PrefixName}-prd-vm-datadisk'
-            lun: 0
-            diskSizeGB: dataDiskSizeGB
-            createOption: 'Empty'
-            managedDisk: {
-              storageAccountType: 'Standard_LRS'
-            }
-          }
-        ]
-      }
-      networkProfile: {
-        networkInterfaces: [
-          {
-            id: networkInterfaceprd.id
-          }
-        ]
-      }
-      osProfile: {
-        computerName: '${PrefixName}-prd-vm'
-        adminUsername: adminUsername
-        linuxConfiguration: {
-          disablePasswordAuthentication: true
-          ssh: {
-            publicKeys: [
-              {
-                path: '/home/${adminUsername}/.ssh/authorized_keys'
-                keyData: adminPublicKey
-              }
-            ]
-          }
-        }
-      }
-    }
-  }
+output vmId string = vm.id
+output principalId string = vm.identity.principalId
+output publicIPAddress string = publicIP.properties.ipAddress

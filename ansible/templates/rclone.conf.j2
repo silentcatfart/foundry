@@ -1,0 +1,8 @@
+[{{ rclone_remote }}]
+type = azureblob
+account = fndryst
+{% if rclone_auth == 'msi' %}
+use_msi = true
+{% else %}
+key = {{ blob_sas_key }}
+{% endif %}

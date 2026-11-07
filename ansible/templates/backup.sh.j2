@@ -1,0 +1,8 @@
+#!/bin/bash
+# {{ ansible_managed }}
+# Routine backup of the Foundry drive to blob storage (container: {{ foundry_env }})
+pm2 stop foundry
+/usr/bin/rclone sync {{ foundry_drive }} "{{ rclone_remote }}":{{ foundry_env }} --copy-links \
+  --exclude "**/age-shared/**" \
+  --exclude "**/artifacts/**"
+pm2 start foundry

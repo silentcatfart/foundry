@@ -1,0 +1,28 @@
+---
+# Shared settings for every Foundry server. Secrets live in vault.yml (ansible-vault).
+foundry_user: foundry
+foundry_home: /home/foundry
+foundry_drive: "{{ foundry_home }}/foundrydrive"          # symlink to {{ data_disk_mount }}/foundryvtt
+foundry_install_dir: "{{ foundry_drive }}/foundry"
+foundry_data_dir: "{{ foundry_drive }}/foundryuserdata"
+foundry_artifacts_dir: "{{ foundry_data_dir }}/Data/artifacts"
+foundry_port: 30000
+
+# Azure data disk (LUN 0). /dev/sdX names are not stable on Azure, so use the udev symlink.
+data_disk_device: /dev/disk/azure/scsi1/lun0
+data_disk_partition: "{{ data_disk_device }}-part1"
+data_disk_mount: /datadrive
+
+node_major: 24
+
+rclone_remote: azure blob
+rclone_config: "{{ foundry_home }}/.config/rclone/rclone.conf"
+
+# Per-environment settings are in group_vars/<dev|tst|prd>.yml.
+# Automatic artifact pulls (boot service, refresh script, cron) are never set up on tst:
+# tst is the source of truth and only ever pushes (~/release). Not overridable per group.
+compendium_pull: "{{ foundry_env != 'tst' }}"
+
+# rclone auth: "key" (storage account key from the vault) or "msi" (VM managed identity).
+# msi needs the Bicep role assignments (assignStorageRoles) and the official rclone build.
+rclone_auth: key

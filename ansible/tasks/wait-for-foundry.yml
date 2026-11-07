@@ -1,0 +1,10 @@
+---
+- name: Wait for foundry to write its config
+  ansible.builtin.wait_for:
+    path: "{{ foundry_data_dir }}/Config/options.json"
+    timeout: 300
+
+- name: Wait for foundry to listen on port {{ foundry_port }}
+  ansible.builtin.wait_for:
+    port: "{{ foundry_port }}"
+    timeout: 300

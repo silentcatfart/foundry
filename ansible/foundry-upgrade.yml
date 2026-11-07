@@ -1,53 +1,16 @@
 ---
-- hosts: [all]
+- name: Upgrade Foundry in place
+  hosts: all
   become: false
   gather_facts: false
 
-  vars_files:
-    - var-secrets.yml
-
   tasks:
-      - name: Make foundry directories
-        ansible.builtin.shell:
-          chdir: foundrydrive
-          cmd: |
-            mkdir -p foundry
-            mkdir -p foundryuserdata
+    - name: Download and unpack foundry
+      ansible.builtin.include_tasks: tasks/download-foundry.yml
 
-      - name: Download foundry (dev)
-        ansible.builtin.shell:
-          chdir: /home/foundry
-          cmd: |
-            wget --output-document /home/foundry/foundrydrive/foundry/foundryvtt.zip {{ foundry_beta_url }}
-        when: inventory_hostname == 'dev.foundry.silentcatfart.com'    
+    - name: Start foundry
+      ansible.builtin.command:
+        cmd: pm2 start foundry
 
-      - name: Download foundry (tst)
-        ansible.builtin.shell:
-          chdir: /home/foundry
-          cmd: |
-            wget --output-document /home/foundry/foundrydrive/foundry/foundryvtt.zip {{ foundry_url }}
-        when: inventory_hostname == 'tst.foundry.silentcatfart.com'    
-
-      - name: Download foundry (prd)
-        ansible.builtin.shell:
-          chdir: /home/foundry
-          cmd: |
-            wget --output-document /home/foundry/foundrydrive/foundry/foundryvtt.zip {{ foundry_url }}
-        when: inventory_hostname == 'prd.foundry.silentcatfart.com'    
-
-      - name: Unzip foundry
-        ansible.builtin.shell:
-          chdir: /home/foundry
-          cmd: |
-            unzip /home/foundry/foundrydrive/foundry/foundryvtt.zip  -d /home/foundry/foundrydrive/foundry/
-            rm /home/foundry/foundrydrive/foundry/foundryvtt.zip
-
-      - name: Start foundry
-        ansible.builtin.shell:
-          cmd: |
-            pm2 start foundry
-
-      - name: Pause for 120 seconds while foundry service builds out user data path
-        ansible.builtin.pause:
-          seconds: 120
-      
+    - name: Wait for foundry to come up
+      ansible.builtin.include_tasks: tasks/wait-for-foundry.yml

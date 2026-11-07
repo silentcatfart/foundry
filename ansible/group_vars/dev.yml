@@ -1,0 +1,4 @@
+---
+# Testing new Foundry versions
+foundry_env: dev
+foundry_download_url: "{{ foundry_beta_url }}"

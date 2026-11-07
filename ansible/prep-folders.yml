@@ -1,23 +1,22 @@
 ---
-- hosts: [all]
+- name: Foundry folders on the data disk
+  hosts: all
   become: true
   gather_facts: false
 
-  vars_files:
-    - var-secrets.yml
-
   tasks:
-      - name: Make foundry directory
-        ansible.builtin.shell:
-          chdir: /datadrive
-          cmd: |
-            sudo mkdir foundryvtt
-            sudo chmod -R 777 foundryvtt
+    - name: Make foundry directory on the data disk
+      ansible.builtin.file:
+        path: "{{ data_disk_mount }}/foundryvtt"
+        state: directory
+        owner: "{{ foundry_user }}"
+        group: "{{ foundry_user }}"
+        mode: "0755"
 
-      - name: Create symbolic link in home directory
-        ansible.builtin.shell:
-          chdir: /home/foundry
-          cmd: |
-            ln -s  /datadrive/foundryvtt foundrydrive
-
-
+    - name: Link it into the foundry home directory
+      ansible.builtin.file:
+        src: "{{ data_disk_mount }}/foundryvtt"
+        dest: "{{ foundry_drive }}"
+        state: link
+        owner: "{{ foundry_user }}"
+        group: "{{ foundry_user }}"

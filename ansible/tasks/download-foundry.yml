@@ -1,0 +1,28 @@
+---
+# Shared by foundry-install.yml and foundry-upgrade.yml. Runs as the foundry user.
+- name: Ensure foundry directories exist
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ foundry_install_dir }}"
+    - "{{ foundry_data_dir }}"
+
+- name: Download foundry ({{ foundry_env }})
+  ansible.builtin.get_url:
+    url: "{{ foundry_download_url }}"
+    dest: "{{ foundry_install_dir }}/foundryvtt.zip"
+    mode: "0644"
+    force: true
+
+- name: Unzip foundry
+  ansible.builtin.unarchive:
+    src: "{{ foundry_install_dir }}/foundryvtt.zip"
+    dest: "{{ foundry_install_dir }}"
+    remote_src: true
+
+- name: Remove foundry zip
+  ansible.builtin.file:
+    path: "{{ foundry_install_dir }}/foundryvtt.zip"
+    state: absent

@@ -1,15 +1,17 @@
 ---
-- hosts: [all]
+- name: Install pm2 and register it with systemd
+  hosts: all
   become: true
   gather_facts: false
 
-  vars_files:
-    - var-secrets.yml
-
   tasks:
-      - name: Install pm2
-        ansible.builtin.shell:
-          cmd: |
-            sudo npm install pm2@latest -g
-            pm2 startup
-            sudo env PATH=$PATH:/usr/bin /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u foundry --hp /home/foundry
+    - name: Install pm2
+      community.general.npm:
+        name: pm2
+        global: true
+        state: latest
+
+    - name: Register pm2 startup service for the foundry user
+      ansible.builtin.command:
+        cmd: /usr/lib/node_modules/pm2/bin/pm2 startup systemd -u {{ foundry_user }} --hp {{ foundry_home }}
+        creates: /etc/systemd/system/pm2-{{ foundry_user }}.service

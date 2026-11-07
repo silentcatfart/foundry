@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+# /etc/systemd/system/rclone-az-compendium-to-local.service
+# Pulls compendium artifacts from blob storage at boot (and whenever refresh-compendium.yml runs).
+
+[Unit]
+Description=Sync compendium artifacts from Azure blob storage
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User={{ foundry_user }}
+Environment=RCLONE_CONFIG={{ rclone_config }}
+ExecStart=/usr/bin/rclone sync "{{ rclone_remote }}":artifacts {{ foundry_artifacts_dir }} \
+  --log-file {{ foundry_home }}/rclone-az.log --log-level INFO
+
+[Install]
+WantedBy=multi-user.target

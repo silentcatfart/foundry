@@ -1,53 +1,59 @@
 ---
-- hosts: [all]
+- name: Package repositories and prerequisites
+  hosts: all
   become: true
   gather_facts: false
 
-  vars_files:
-    - var-secrets.yml
-
   tasks:
-      - name: Install prerequisites for gpg keys
-        ansible.builtin.apt:
-          pkg:
+    - name: Install prerequisites
+      ansible.builtin.apt:
+        pkg:
           - ca-certificates
           - curl
           - gnupg
           - net-tools
+          - python3-debian   # needed by deb822_repository
+        update_cache: true
 
-      - name: Prep caddy repo
-        ansible.builtin.shell:
-          cmd: |
-            apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
-            curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --batch --yes --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-            curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
-            chmod o+r /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-            chmod o+r /etc/apt/sources.list.d/caddy-stable.list
+    # Older runs wrote one-line .list files; leaving them next to the deb822 sources
+    # makes apt fail with conflicting Signed-By values.
+    - name: Remove legacy repo files
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/apt/sources.list.d/caddy-stable.list
+        - /etc/apt/sources.list.d/nodesource.list
 
-      - name: Prep node 24 repo
-        ansible.builtin.shell:
-          cmd: |
-            apt install -y ca-certificates curl gnupg
-            mkdir -p /etc/apt/keyrings
-            curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --batch --yes --dearmor -o /etc/apt/keyrings/nodesource.gpg
-            NODE_MAJOR=24
-            echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+    - name: Add caddy repo
+      ansible.builtin.deb822_repository:
+        name: caddy-stable
+        types: deb
+        uris: https://dl.cloudsmith.io/public/caddy/stable/deb/debian
+        suites: any-version
+        components: main
+        signed_by: https://dl.cloudsmith.io/public/caddy/stable/gpg.key
 
+    - name: Add node {{ node_major }} repo
+      ansible.builtin.deb822_repository:
+        name: nodesource
+        types: deb
+        uris: https://deb.nodesource.com/node_{{ node_major }}.x
+        suites: nodistro
+        components: main
+        signed_by: https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key
 
-      - name: Update package cache
-        ansible.builtin.apt:
-          update_cache=yes
-
-      - name: Install caddy, node and npm
-        ansible.builtin.apt:
-          pkg:
+    - name: Install caddy and tools
+      ansible.builtin.apt:
+        pkg:
           - libnss3-tools
           - caddy
           - unzip
-          state: present
+        state: present
+        update_cache: true
 
-      - name: Upgrade nodejs
-        ansible.builtin.apt:
-          pkg:
-          - nodejs  # installs npm as well
-          state: latest
+    - name: Upgrade nodejs (includes npm)
+      ansible.builtin.apt:
+        pkg:
+          - nodejs
+        state: latest

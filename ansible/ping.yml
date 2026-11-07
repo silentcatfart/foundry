@@ -1,5 +1,8 @@
 ---
-  - hosts: [all]
-    tasks:
-      - name: Ping all servers
-        action: ping
+- name: Ping all servers
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Ping all servers
+      ansible.builtin.ping:

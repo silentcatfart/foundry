@@ -1,38 +1,34 @@
 ---
-- hosts: [all]
+- name: Cron jobs
+  hosts: all
   become: true
   gather_facts: false
 
-  vars_files:
-    - var-secrets.yml
-
   tasks:
-    - name: Nightly backup to Azure Storage"
+    # Must run before the Azure auto-shutdown (01:15 Eastern, see Bicep shutdownTime).
+    # A VM that is already off at this time skips that night's backup.
+    - name: Nightly backup to Azure Storage
       ansible.builtin.cron:
         name: "az-backup"
-        minute: "30"
-        hour: "1"
-        job: "/home/foundry/backup"
-        user: foundry
-        disabled: true
+        minute: "50"
+        hour: "0"
+        job: "{{ foundry_home }}/backup >> {{ foundry_home }}/backup.log 2>&1"
+        user: "{{ foundry_user }}"
+        disabled: false
 
-    - name: Nightly compendium download from Azure Storage (prd)"
+    - name: Nightly compendium download from Azure Storage
       ansible.builtin.cron:
-        name: "az-dowload"
+        name: "az-dowload"   # existing cron entry name; renaming would leave a duplicate behind
         minute: "00"
         hour: "1"
-        job: "/home/foundry/compendium-content-refresh"
-        user: foundry
+        job: "{{ foundry_home }}/compendium-content-refresh"
+        user: "{{ foundry_user }}"
         disabled: true
-      when: inventory_hostname == 'prd.foundry.silentcatfart.com'  
+      when: compendium_pull | bool and foundry_env != 'tst'
 
-    - name: Nightly compendium download from Azure Storage (dev)"
+    - name: Make sure tst has no compendium download job
       ansible.builtin.cron:
         name: "az-dowload"
-        minute: "00"
-        hour: "1"
-        job: "/home/foundry/compendium-content-refresh"
-        user: foundry
-        disabled: true
-      when: inventory_hostname == 'dev.foundry.silentcatfart.com'
-          
+        user: "{{ foundry_user }}"
+        state: absent
+      when: foundry_env == 'tst' or not compendium_pull | bool

@@ -16,10 +16,11 @@ permissions:
 
 env:
   AZURE_LOCATION: eastus2
+  TEMPLATE: ./bicep/deploy/foundry.bicep
+  PARAMETERS: ./bicep/deploy/foundry.parameters.bicepparam
   # Read by foundry.parameters.bicepparam via readEnvironmentVariable()
   SHUTDOWN_NOTIFICATION_EMAIL: ${{ secrets.SHUTDOWN_NOTIFICATION_EMAIL }}
   ACTION_GROUP_RESOURCE_ID: ${{ secrets.ACTION_GROUP_RESOURCE_ID }}
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true ## Actions will be forced to run with Node.js 24 by default starting June 2nd, 2026. Node.js 20 will be removed from the runner on September 16th, 2026
 
 jobs:
   what-if:
@@ -29,20 +30,23 @@ jobs:
       name: what-if
     steps:
     - uses: actions/checkout@v5
-    - uses: azure/login@v2
+    - uses: azure/login@v3
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     - name: Run What-If
-      uses: azure/arm-deploy@v2
-      with:
-        scope: subscription
-        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        region: ${{ env.AZURE_LOCATION }}
-        template: ./bicep/deploy/foundry.bicep
-        parameters: ./bicep/deploy/foundry.parameters.bicepparam
-        additionalArguments: --what-if
+      run: |
+        az deployment sub what-if \
+          --location "$AZURE_LOCATION" \
+          --template-file "$TEMPLATE" \
+          --parameters "$PARAMETERS" | tee whatif.txt
+        {
+          echo '## Bicep what-if'
+          echo '```'
+          cat whatif.txt
+          echo '```'
+        } >> "$GITHUB_STEP_SUMMARY"
 
   deploy:
     name: Deploy to Azure
@@ -52,16 +56,16 @@ jobs:
       name: prod ## approval gate to review what-if results before deploying
     steps:
     - uses: actions/checkout@v5
-    - uses: azure/login@v2
+    - uses: azure/login@v3
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    - uses: azure/arm-deploy@v2
-      with:
-        scope: subscription
-        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        region: ${{ env.AZURE_LOCATION }}
-        deploymentName: ${{ github.run_number }}
-        template: ./bicep/deploy/foundry.bicep
-        parameters: ./bicep/deploy/foundry.parameters.bicepparam
+    - name: Deploy
+      run: |
+        az deployment sub create \
+          --name "${{ github.run_number }}" \
+          --location "$AZURE_LOCATION" \
+          --template-file "$TEMPLATE" \
+          --parameters "$PARAMETERS" \
+          --query "{name:name, state:properties.provisioningState}" -o table

@@ -102,6 +102,8 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-07-01' = {
           lun: 0
           diskSizeGB: dataDiskSizeGB
           createOption: 'Empty'
+          caching: 'None' // matches the deployed disks
+          deleteOption: 'Detach' // keep the data disk if the VM is ever deleted
           managedDisk: {
             storageAccountType: diskSku
           }

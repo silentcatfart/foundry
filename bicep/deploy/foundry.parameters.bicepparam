@@ -50,7 +50,7 @@ param environments = [
 ]
 
 param dataDiskSizeGB = 64
-param diskSku = 'Standard_LRS' // StandardSSD_LRS once the disks are converted (see README)
+param diskSku = 'StandardSSD_LRS'
 
 param shutdownTime = '0115'
 param shutdownTimeZone = 'Eastern Standard Time'

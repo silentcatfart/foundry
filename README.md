@@ -38,16 +38,17 @@ tst only (`~/release`); dev and prd pull them at boot. tst never pulls automatic
 
 ## Runbooks
 
-### Convert disks to Standard SSD (no rebuild)
+### Change disk SKU (no rebuild)
+
+Disks are Standard SSD (converted 2026-11-07). To change SKU again, with the VM deallocated:
 
 ```bash
 az vm deallocate -g foundry-rg -n fndry-prd-vm
-az disk update -g foundry-rg -n fndry-prd-vm-osdisk   --sku StandardSSD_LRS
-az disk update -g foundry-rg -n fndry-prd-vm-datadisk --sku StandardSSD_LRS
-az vm start -g foundry-rg -n fndry-prd-vm
+az disk update -g foundry-rg -n fndry-prd-vm-osdisk   --sku <SKU>
+az disk update -g foundry-rg -n fndry-prd-vm-datadisk --sku <SKU>
 ```
 
-Repeat per VM, then set `diskSku = 'StandardSSD_LRS'` in the param file so the what-if shows no change.
+Then set `diskSku` in the param file to match so the what-if shows no change.
 
 ### Switch rclone to managed identity
 

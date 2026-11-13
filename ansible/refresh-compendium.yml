@@ -5,6 +5,16 @@
   gather_facts: false
 
   tasks:
+    # Same check as prep-folders.yml: the sync runs as the foundry user and fails on
+    # anything root owns, which once left GM PDFs on dev that should have been removed.
+    - name: Make sure the foundry user owns the artifacts folder
+      ansible.builtin.file:
+        path: "{{ foundry_artifacts_dir }}"
+        state: directory
+        recurse: true
+        owner: "{{ foundry_user }}"
+        group: "{{ foundry_user }}"
+
     - name: Create rclone-az-compendium-to-local.service
       ansible.builtin.template:
         src: rclone-az-compendium-to-local.service.j2

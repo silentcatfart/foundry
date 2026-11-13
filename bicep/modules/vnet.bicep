@@ -65,8 +65,8 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2024-07-01' = {
         }
       }
       {
-        // Only Caddy is exposed. Foundry's own port (30000) stays closed so the
-        // Caddy basic_auth on the GM-only PDFs can't be bypassed.
+        // Only Caddy is exposed. Foundry's own port (30000) stays closed so all
+        // traffic goes through Caddy's TLS.
         name: 'Allow-Foundry-Inbound'
         properties: {
           description: 'HTTP/HTTPS to Caddy, which reverse-proxies Foundry'

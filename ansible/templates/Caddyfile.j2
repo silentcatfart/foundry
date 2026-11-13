@@ -5,24 +5,13 @@
 default_sni {{ ansible_default_ipv4.address }}
 }
 
-# GM-only books: password-protected so players can't open them via the file picker or a direct URL.
-# The Player's Book and Welcome to Dolmenwood stay open, as does all art in the folder.
-(gm_books) {
-@gm_books path /artifacts/pdfs/Dolmenwood/Dolmenwood_Campaign_Book.pdf /artifacts/pdfs/Dolmenwood/Dolmenwood_Monster_Book.pdf /artifacts/pdfs/Dolmenwood/Dolmenwood_Maps_Book.pdf
-basic_auth @gm_books {
-{{ caddy_gm_user }} {{ caddy_gm_password | password_hash('bcrypt', salt=caddy_gm_salt) }}
-}
-}
-
 {{ ansible_default_ipv4.address }} {
-import gm_books
 tls internal
 reverse_proxy localhost:{{ foundry_port }}
 encode zstd gzip
 }
 
 {{ inventory_hostname }} {
-import gm_books
 reverse_proxy localhost:{{ foundry_port }}
 encode zstd gzip
 }

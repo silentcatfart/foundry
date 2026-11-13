@@ -20,3 +20,13 @@
         state: link
         owner: "{{ foundry_user }}"
         group: "{{ foundry_user }}"
+
+    # The blob sync runs as the foundry user, so it can't update or delete anything
+    # root owns here (a root rclone run on dev once left GM PDFs it couldn't remove).
+    - name: Make sure the foundry user owns the artifacts folder
+      ansible.builtin.file:
+        path: "{{ foundry_artifacts_dir }}"
+        state: directory
+        recurse: true
+        owner: "{{ foundry_user }}"
+        group: "{{ foundry_user }}"

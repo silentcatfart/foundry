@@ -17,7 +17,7 @@ the deploy job waits for approval on the `prod` environment.
 What it manages, all in `foundry-rg`:
 
 * VNet/subnet and NSG: inbound SSH from `myPublicIPv4` only, 80/443 from the Internet (Caddy).
-  Foundry's own port 30000 is **not** exposed, so Caddy's GM-only PDF password can't be bypassed.
+  Foundry's own port 30000 is **not** exposed, so all traffic goes through Caddy's TLS.
 * One VM per entry in `environments` (dev, tst, prd): public IP, NIC, Standard SSD OS + 64 GB data disk,
   system-assigned managed identity
 * Daily auto-shutdown at 01:15 Eastern with a 30-minute warning email
@@ -71,7 +71,9 @@ ansible-playbook caddy.yml --check --diff --limit tst.foundry.silentcatfart.com 
 * `group_vars/all/vars.yml` - shared paths and settings (`rclone_auth: msi`)
 * `group_vars/all/vault.yml` - secrets (ansible-vault)
 * `group_vars/<dev|tst|prd>.yml` - per-environment settings
-* `templates/` - Caddyfile, helper scripts, systemd units
+* `templates/` - Caddyfile, helper scripts, systemd units. Caddy is a plain TLS reverse proxy: the
+  Dolmenwood book PDFs now ship inside the Dolmenwood Premium Game module, so they are no longer kept in
+  `artifacts` and Caddy no longer password-protects any files.
 * `new-servers.yml` - full build of a new server; `big-upgrade.yml` - major Foundry version upgrade
 
 ### Backups and compendium flow
@@ -83,6 +85,8 @@ ansible-playbook caddy.yml --check --diff --limit tst.foundry.silentcatfart.com 
 * **Publish (tst only):** `~/release` pushes the shared-assets module and `artifacts` to blob storage.
 * **Pull (dev and prd):** `rclone-az-compendium-to-local.service` pulls `artifacts` at every boot
   (log: `~/rclone-az.log`). tst never pulls automatically; this is enforced in the playbooks.
+  The service runs as the foundry user, so `refresh-compendium.yml` (and `prep-folders.yml`) first make
+  sure that user owns `artifacts`; anything owned by root there makes the sync fail.
 * **New tst server:** `~/compendium-content-refresh-one-time` pulls `artifacts` once, and refuses to run
   if the local folder isn't empty.
 * `check-artifacts.yml` reports whether each server's `artifacts` matches blob storage.

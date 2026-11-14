@@ -11,7 +11,6 @@
         dest: /etc/caddy/Caddyfile
         mode: "0644"
         validate: caddy validate --adapter caddyfile --config %s
-      no_log: true   # contains the GM basic_auth hash
       notify: Reload caddy
 
   handlers:

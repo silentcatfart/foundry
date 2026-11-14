@@ -11,6 +11,7 @@
   - import_playbook: refresh-compendium.yml
   - import_playbook: foundry-install.yml
   - import_playbook: options.yml
+  - import_playbook: file-privacy.yml
   - import_playbook: caddy.yml ## gets you to a vanilla install running on https up to entering the license file
   - import_playbook: packageupdates.yml  
 #  - import_playbook: ngrok.yml ## used for minecraft server

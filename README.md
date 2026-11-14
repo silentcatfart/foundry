@@ -75,6 +75,11 @@ ansible-playbook caddy.yml --check --diff --limit tst.foundry.silentcatfart.com 
   Dolmenwood book PDFs now ship inside the Dolmenwood Premium Game module, so they are no longer kept in
   `artifacts` and Caddy no longer password-protects any files.
 * `new-servers.yml` - full build of a new server; `big-upgrade.yml` - major Foundry version upgrade
+* `file-privacy.yml` - hides User Data folders from players' file browser (Foundry's File Picker privacy
+  mode, `Config/storage.json`), so players browsing for token art see `artifacts/images/tokens` and not
+  referee maps or the Premium Game's art. The folders are `foundry_private_dirs` in
+  `group_vars/all/vars.yml`. It restarts Foundry when the list changes, and it replaces anything set by hand
+  with the File Picker's privacy button. Privacy only hides folders from browsing: files still load by URL.
 
 ### Backups and compendium flow
 

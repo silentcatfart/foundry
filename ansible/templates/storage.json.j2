@@ -1,0 +1,9 @@
+{# Foundry's File Picker settings (Config/storage.json). Keys are folder paths in User Data, URL-encoded as Foundry
+   stores them, so a folder name with spaces needs %20 here. #}
+{
+  "data": {
+{% for dir in foundry_private_dirs %}
+    {{ dir | to_json }}: {"private": true}{{ "," if not loop.last else "" }}
+{% endfor %}
+  }
+}

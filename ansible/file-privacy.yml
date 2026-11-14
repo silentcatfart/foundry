@@ -1,0 +1,24 @@
+---
+# Hides User Data folders from players' file browser (Foundry's File Picker privacy mode), so players browsing for
+# token art land in artifacts/images/tokens and can't browse referee maps or the Premium Game's art.
+# Folders are listed in group_vars/all/vars.yml (foundry_private_dirs). Foundry reads Config/storage.json only at
+# startup, so Foundry restarts when it changes. This replaces privacy toggled by hand in the File Picker.
+- name: Set File Picker privacy for players
+  hosts: all
+  become: false
+  gather_facts: false
+
+  tasks:
+    - name: Write Config/storage.json
+      ansible.builtin.template:
+        src: storage.json.j2
+        dest: "{{ foundry_data_dir }}/Config/storage.json"
+        owner: "{{ foundry_user }}"
+        group: "{{ foundry_user }}"
+        mode: "0644"
+      notify: Restart foundry
+
+  handlers:
+    - name: Restart foundry
+      ansible.builtin.command:
+        cmd: pm2 restart foundry
